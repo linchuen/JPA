@@ -1,0 +1,13 @@
+spring:
+  profiles:
+    include: @env@
+
+  redis:
+    database: 0
+    host: 127.0.0.1
+    port: 6379
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
