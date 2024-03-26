@@ -1,7 +1,7 @@
 package com.cooba.component.walletorder;
 
 import com.cooba.entity.WalletOrderEntity;
-import com.cooba.enums.TransferTypeEnum;
+import com.cooba.enums.WalletTransferEnum;
 import com.cooba.enums.WalletStatusEnum;
 import com.cooba.repository.WalletRecordRepository;
 import com.cooba.request.WalletRequest;
@@ -20,7 +20,7 @@ public class WalletOrderImpl implements WalletOrder {
 
     @Override
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRES_NEW)
-    public WalletOrderEntity create(WalletRequest walletRequest, TransferTypeEnum transferType) {
+    public WalletOrderEntity create(WalletRequest walletRequest, WalletTransferEnum transferType) {
         WalletOrderEntity order = WalletOrderEntity.builder()
                 .orderId(walletRequest.getOrderId())
                 .userId(walletRequest.getUserId())

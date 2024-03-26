@@ -4,9 +4,10 @@ import com.cooba.request.BuyRequest;
 import com.cooba.request.CreateMerchantRequest;
 import com.cooba.result.BuyResult;
 import com.cooba.result.CreateMerchantResult;
+import com.cooba.result.PayResult;
 
 public interface ShopService {
     CreateMerchantResult createMerchant(CreateMerchantRequest createMerchantRequest);
 
-    BuyResult saleGoods(BuyRequest buyRequest);
+    PayResult saleGoods(BuyRequest buyRequest);
 }

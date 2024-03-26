@@ -4,10 +4,9 @@ import com.cooba.component.wallet.Wallet;
 import com.cooba.component.wallet.WalletFactory;
 import com.cooba.component.walletorder.WalletOrder;
 import com.cooba.dto.InventoryPriceDto;
-import com.cooba.dto.PriceDto;
 import com.cooba.entity.UserEntity;
 import com.cooba.entity.WalletOrderEntity;
-import com.cooba.enums.TransferTypeEnum;
+import com.cooba.enums.WalletTransferEnum;
 import com.cooba.enums.UserEnum;
 import com.cooba.enums.WalletEnum;
 import com.cooba.exception.CurrencyNotSupportException;
@@ -21,6 +20,7 @@ import com.cooba.request.WalletRequest;
 import com.cooba.result.CreateUserResult;
 import com.cooba.result.PayResult;
 import com.cooba.result.WalletChangeResult;
+import com.cooba.util.order.OrderNumGenerator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -38,6 +38,7 @@ public class DefaultUser implements User {
     private final UserRepository userRepository;
     private final WalletOrder walletOrder;
     private final GoodsInventoryMapper goodsInventoryMapper;
+    private final OrderNumGenerator orderNumGenerator;
 
     @Override
     public CreateUserResult create(CreateUserRequest createUserRequest) {
@@ -61,7 +62,7 @@ public class DefaultUser implements User {
         Integer assetId = walletRequest.getAssetId();
         BigDecimal amount = walletRequest.getAmount();
 
-        WalletOrderEntity order = walletOrder.create(walletRequest, TransferTypeEnum.DEPOSIT);
+        WalletOrderEntity order = walletOrder.create(walletRequest, WalletTransferEnum.DEPOSIT);
 
         Wallet wallet = walletFactory.getByEnum(WalletEnum.DEFAULT);
         WalletChangeResult walletChangeResult = wallet.increaseAsset(userId, assetId, amount);
@@ -76,7 +77,7 @@ public class DefaultUser implements User {
         Integer assetId = walletRequest.getAssetId();
         BigDecimal amount = walletRequest.getAmount();
 
-        WalletOrderEntity order = walletOrder.create(walletRequest, TransferTypeEnum.WITHDRAW);
+        WalletOrderEntity order = walletOrder.create(walletRequest, WalletTransferEnum.WITHDRAW);
 
         Wallet wallet = walletFactory.getByEnum(WalletEnum.DEFAULT);
         WalletChangeResult walletChangeResult = wallet.decreaseAsset(userId, assetId, amount);
@@ -86,6 +87,7 @@ public class DefaultUser implements User {
 
     @Override
     public PayResult buy(BuyRequest buyRequest) {
+        Long userId = buyRequest.getUserId();
         Integer paymentAssetId = buyRequest.getPaymentAssetId();
         List<GoodsAmountRequest> goodsAmountRequests = buyRequest.getGoodsAmountRequests();
         List<Long> idList = goodsAmountRequests.stream().map(GoodsAmountRequest::getGoodsId).collect(Collectors.toList());
@@ -108,17 +110,24 @@ public class DefaultUser implements User {
                 .map(request -> request.getAmount().multiply(goodsIdPriceMap.get(request.getGoodsId())))
                 .reduce(BigDecimal.ZERO,BigDecimal::add);
 
+        String orderId = orderNumGenerator.generate();
+
         WalletRequest walletRequest = new WalletRequest();
-        walletRequest.setUserId();
-        walletRequest.setOrderId();
-        walletRequest.setUserId();
-        WalletOrderEntity order = walletOrder.create(walletRequest, TransferTypeEnum.WITHDRAW);
+        walletRequest.setUserId(userId);
+        walletRequest.setOrderId(orderId);
+        walletRequest.setAssetId(paymentAssetId);
+        walletRequest.setAmount(totalPrice);
+        WalletOrderEntity order = walletOrder.create(walletRequest, WalletTransferEnum.WITHDRAW);
 
         Wallet wallet = walletFactory.getByEnum(WalletEnum.DEFAULT);
-        WalletChangeResult walletChangeResult = wallet.decreaseAsset(userId, assetId, amount);
+        WalletChangeResult walletChangeResult = wallet.decreaseAsset(userId, paymentAssetId, totalPrice);
         walletOrder.updateStatus(order, walletChangeResult);
 
-        return null;
+        return PayResult.builder()
+                .isSuccess(true)
+                .transferBalance(walletChangeResult.getTransferBalance())
+                .totalPrice(totalPrice)
+                .build();
     }
 
 

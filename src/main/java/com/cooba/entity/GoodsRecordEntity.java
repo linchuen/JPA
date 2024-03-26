@@ -31,7 +31,6 @@ public class GoodsRecordEntity {
     private Integer merchantId;
     private Long goodsId;
     private Integer transferType;
-    private Integer status;
     @Version
     private Integer version;
     private BigDecimal changeAmount;
