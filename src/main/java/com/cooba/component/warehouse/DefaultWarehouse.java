@@ -1,12 +1,10 @@
 package com.cooba.component.warehouse;
 
 import com.cooba.entity.GoodsInventoryEntity;
-import com.cooba.entity.WalletEntity;
 import com.cooba.enums.WarehouseEnum;
 import com.cooba.exception.InsufficientBalanceException;
 import com.cooba.repository.GoodsInventoryRepository;
 import com.cooba.result.InventoryChangeResult;
-import com.cooba.result.WalletChangeResult;
 import com.cooba.util.lock.CustomLock;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

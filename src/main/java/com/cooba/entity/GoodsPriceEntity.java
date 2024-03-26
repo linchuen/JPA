@@ -5,7 +5,13 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import javax.persistence.*;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.Table;
+import javax.persistence.UniqueConstraint;
+import javax.persistence.Version;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
@@ -13,9 +19,9 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@Entity(name = "goods")
+@Entity(name = "goods_price")
 @Table(uniqueConstraints = {
-        @UniqueConstraint(name = "unique_name", columnNames = "merchantId,name"),
+        @UniqueConstraint(name = "unique_key", columnNames = {"goodsId", "assetId"}),
 })
 public class GoodsPriceEntity {
     @Id

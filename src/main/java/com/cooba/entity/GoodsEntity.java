@@ -19,7 +19,7 @@ import java.time.LocalDateTime;
 @Builder
 @Entity(name = "goods")
 @Table(uniqueConstraints = {
-        @UniqueConstraint(name = "unique_name", columnNames = "merchantId,name"),
+        @UniqueConstraint(name = "unique_name", columnNames = {"merchantId","name"}),
 })
 public class GoodsEntity {
     @Id

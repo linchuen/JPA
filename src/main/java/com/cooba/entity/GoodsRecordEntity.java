@@ -19,9 +19,9 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@Entity(name = "goods")
+@Entity(name = "goods_record")
 @Table(uniqueConstraints = {
-        @UniqueConstraint(name = "unique_name", columnNames = "orderId,goodsId,transferType"),
+        @UniqueConstraint(name = "unique_name", columnNames = {"orderId", "goodsId", "transferType"}),
 })
 public class GoodsRecordEntity {
     @Id

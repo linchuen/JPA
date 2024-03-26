@@ -11,3 +11,9 @@ spring:
     hibernate:
       ddl-auto: update
     show-sql: true
+
+mybatis:
+  mapper-locations: classpath:mybatis/*.xml
+  configuration:
+    cache-enabled: false
+    local-cache-scope: statement

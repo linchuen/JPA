@@ -23,7 +23,6 @@ public class GoodsOrderEntity {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
     private String orderId;
-    private List<Long> recordIds;
     private Integer status;
     @Version
     private Integer version;

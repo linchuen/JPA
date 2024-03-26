@@ -1,4 +1,4 @@
-package com.cooba.component.wallet_order;
+package com.cooba.component.walletorder;
 
 import com.cooba.entity.WalletOrderEntity;
 import com.cooba.enums.TransferTypeEnum;

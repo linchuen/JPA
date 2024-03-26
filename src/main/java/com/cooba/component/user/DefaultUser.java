@@ -1,18 +1,25 @@
 package com.cooba.component.user;
 
-import com.cooba.component.wallet_order.WalletOrder;
 import com.cooba.component.wallet.Wallet;
 import com.cooba.component.wallet.WalletFactory;
+import com.cooba.component.walletorder.WalletOrder;
+import com.cooba.dto.InventoryPriceDto;
+import com.cooba.dto.PriceDto;
 import com.cooba.entity.UserEntity;
 import com.cooba.entity.WalletOrderEntity;
-import com.cooba.enums.*;
-import com.cooba.repository.GoodsInventoryRepository;
+import com.cooba.enums.TransferTypeEnum;
+import com.cooba.enums.UserEnum;
+import com.cooba.enums.WalletEnum;
+import com.cooba.exception.CurrencyNotSupportException;
+import com.cooba.exception.EmptyStockException;
+import com.cooba.mapper.GoodsInventoryMapper;
 import com.cooba.repository.UserRepository;
 import com.cooba.request.BuyRequest;
 import com.cooba.request.CreateUserRequest;
+import com.cooba.request.GoodsAmountRequest;
 import com.cooba.request.WalletRequest;
-import com.cooba.result.PayResult;
 import com.cooba.result.CreateUserResult;
+import com.cooba.result.PayResult;
 import com.cooba.result.WalletChangeResult;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
@@ -20,6 +27,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Component
 @RequiredArgsConstructor
@@ -27,7 +37,7 @@ public class DefaultUser implements User {
     private final WalletFactory walletFactory;
     private final UserRepository userRepository;
     private final WalletOrder walletOrder;
-    private final GoodsInventoryRepository goodsInventoryRepository;
+    private final GoodsInventoryMapper goodsInventoryMapper;
 
     @Override
     public CreateUserResult create(CreateUserRequest createUserRequest) {
@@ -76,6 +86,37 @@ public class DefaultUser implements User {
 
     @Override
     public PayResult buy(BuyRequest buyRequest) {
+        Integer paymentAssetId = buyRequest.getPaymentAssetId();
+        List<GoodsAmountRequest> goodsAmountRequests = buyRequest.getGoodsAmountRequests();
+        List<Long> idList = goodsAmountRequests.stream().map(GoodsAmountRequest::getGoodsId).collect(Collectors.toList());
+        List<InventoryPriceDto> inventoryPriceDtoList = goodsInventoryMapper.findWithPriceByIds(idList);
+
+        boolean isEmptyStock = inventoryPriceDtoList.stream()
+                .anyMatch(inventoryPriceDto -> inventoryPriceDto.getRemainAmount().compareTo(BigDecimal.ZERO) == 0);
+        if (isEmptyStock){
+            throw new EmptyStockException();
+        }
+
+        Map<Long,BigDecimal> goodsIdPriceMap= inventoryPriceDtoList.stream()
+                .filter(inventoryPriceDto -> inventoryPriceDto.getAssetId().equals(paymentAssetId))
+                .collect(Collectors.toMap(InventoryPriceDto::getGoodsId, InventoryPriceDto::getPrice));
+        if (goodsIdPriceMap.size()!= inventoryPriceDtoList.size()){
+            throw new CurrencyNotSupportException();
+        }
+
+        BigDecimal totalPrice = goodsAmountRequests.stream()
+                .map(request -> request.getAmount().multiply(goodsIdPriceMap.get(request.getGoodsId())))
+                .reduce(BigDecimal.ZERO,BigDecimal::add);
+
+        WalletRequest walletRequest = new WalletRequest();
+        walletRequest.setUserId();
+        walletRequest.setOrderId();
+        walletRequest.setUserId();
+        WalletOrderEntity order = walletOrder.create(walletRequest, TransferTypeEnum.WITHDRAW);
+
+        Wallet wallet = walletFactory.getByEnum(WalletEnum.DEFAULT);
+        WalletChangeResult walletChangeResult = wallet.decreaseAsset(userId, assetId, amount);
+        walletOrder.updateStatus(order, walletChangeResult);
 
         return null;
     }

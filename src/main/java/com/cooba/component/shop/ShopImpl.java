@@ -69,6 +69,7 @@ public class ShopImpl implements Shop {
     @Override
     public SendGoodsResult sendGoods(PayResult payResult) {
         Warehouse warehouse = warehouseFactory.getByEnum(WarehouseEnum.DEFAULT);
+        return null;
     }
 
 
