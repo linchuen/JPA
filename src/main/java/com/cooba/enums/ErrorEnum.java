@@ -12,6 +12,7 @@ public enum ErrorEnum {
     CURRENCY_NOT_SUPPORT(6,"幣種不支援"),
     PARAMETER_NOT_VALID(7,"參數不服"),
     MERCHANT_NOT_EXIST(8,"商戶不存在"),
+    ADMIN_NOT_EXIST(9,"管理者不存在"),
     INTERNAL_ERROR(9999,"內部錯誤");
 
     private final int code;

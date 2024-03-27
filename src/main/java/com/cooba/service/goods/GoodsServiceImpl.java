@@ -1,6 +1,7 @@
 package com.cooba.service.goods;
 
 import com.cooba.component.shop.Shop;
+import com.cooba.exception.MerchantNotExistException;
 import com.cooba.exception.UserNotExistException;
 import com.cooba.repository.MerchantRepository;
 import com.cooba.request.CreateGoodsRequest;
@@ -16,7 +17,7 @@ public class GoodsServiceImpl implements GoodsService {
 
     public CreateGoodsResult createGoods(CreateGoodsRequest createGoodsRequest) {
         Integer merchantId = createGoodsRequest.getMerchantId();
-        merchantRepository.findById(merchantId).orElseThrow(UserNotExistException::new);
+        merchantRepository.findById(merchantId).orElseThrow(MerchantNotExistException::new);
 
         return shop.createGoods(createGoodsRequest);
     }

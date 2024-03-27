@@ -88,7 +88,7 @@ public class ShopImpl implements Shop {
             BigDecimal amount = goodsAmountRequest.getAmount();
 
             InventoryChangeResult changeResult = warehouse.increaseGoods(merchantId, goodsId, amount);
-            insertRecord(orderId, merchantId, goodsId, amount, GoodsTransferEnum.SALE, changeResult);
+            insertRecord(orderId, merchantId, goodsId, amount, GoodsTransferEnum.RESTOCK, changeResult);
         }
     }
 

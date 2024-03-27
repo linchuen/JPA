@@ -24,6 +24,7 @@ public class GoodsOrderEntity {
     private Long id;
     private String orderId;
     private Long userId;
+    private Integer userType;
     private Integer status;
     @Version
     private Integer version;
