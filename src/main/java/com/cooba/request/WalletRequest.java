@@ -1,9 +1,8 @@
 package com.cooba.request;
 
-import com.cooba.annotation.AmountValidation;
 import lombok.Data;
 
-import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.DecimalMin;
 import javax.validation.constraints.NotNull;
 import java.math.BigDecimal;
 
@@ -14,6 +13,6 @@ public class WalletRequest {
     private String orderId;
     @NotNull
     private Integer assetId;
-    @AmountValidation
+    @DecimalMin(value = "0.0", inclusive = false)
     private BigDecimal amount;
 }

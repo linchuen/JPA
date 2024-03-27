@@ -10,6 +10,7 @@ public enum ErrorEnum {
     INSUFFICIENT_GOODS(4,"餘額不足"),
     EMPTY_STOCK(5,"沒有庫存"),
     CURRENCY_NOT_SUPPORT(6,"幣種不支援"),
+    PARAMETER_NOT_VALID(7,"參數不服"),
     INTERNAL_ERROR(9999,"內部錯誤");
 
     private final int code;
