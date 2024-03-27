@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import javax.persistence.*;
 import java.math.BigDecimal;
@@ -20,6 +21,7 @@ import java.util.List;
 @Table(uniqueConstraints = {
         @UniqueConstraint(name = "unique_key", columnNames = "orderId"),
 })
+@EntityListeners(AuditingEntityListener.class)
 public class GoodsOrderEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
