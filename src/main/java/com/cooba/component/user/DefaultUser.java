@@ -6,6 +6,7 @@ import com.cooba.component.walletorder.WalletOrder;
 import com.cooba.dto.InventoryPriceDto;
 import com.cooba.entity.UserEntity;
 import com.cooba.entity.WalletOrderEntity;
+import com.cooba.enums.OrderEnum;
 import com.cooba.enums.WalletTransferEnum;
 import com.cooba.enums.UserEnum;
 import com.cooba.enums.WalletEnum;
@@ -86,7 +87,7 @@ public class DefaultUser implements User {
     }
 
     @Override
-    public PayResult buy(BuyRequest buyRequest) {
+    public PayResult pay(BuyRequest buyRequest) {
         Long userId = buyRequest.getUserId();
         Integer paymentAssetId = buyRequest.getPaymentAssetId();
         List<GoodsAmountRequest> goodsAmountRequests = buyRequest.getGoodsAmountRequests();
@@ -110,7 +111,7 @@ public class DefaultUser implements User {
                 .map(request -> request.getAmount().multiply(goodsIdPriceMap.get(request.getGoodsId())))
                 .reduce(BigDecimal.ZERO,BigDecimal::add);
 
-        String orderId = orderNumGenerator.generate();
+        String orderId = orderNumGenerator.generate(OrderEnum.WALLET);
 
         WalletRequest walletRequest = new WalletRequest();
         walletRequest.setUserId(userId);

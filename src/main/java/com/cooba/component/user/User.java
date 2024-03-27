@@ -17,7 +17,7 @@ public interface User extends Component<UserEnum> {
 
     WalletChangeResult withdraw(WalletRequest walletRequest);
 
-    PayResult buy(BuyRequest buyRequest);
+    PayResult pay(BuyRequest buyRequest);
 
     UserEnum getEnum();
 }

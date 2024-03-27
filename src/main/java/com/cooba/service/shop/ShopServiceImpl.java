@@ -44,7 +44,7 @@ public class ShopServiceImpl implements ShopService {
         GoodsOrderEntity order = goodsOrder.create(orderId, userId);
 
         User user = userFactory.getByEnum(UserEnum.DEFAULT);
-        PayResult payResult = user.buy(buyRequest);
+        PayResult payResult = user.pay(buyRequest);
         shop.sendGoods(payResult, buyRequest);
         goodsOrder.updateStatus(order);
         return payResult;

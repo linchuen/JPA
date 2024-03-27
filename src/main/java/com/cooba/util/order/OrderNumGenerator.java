@@ -1,7 +1,9 @@
 package com.cooba.util.order;
 
+import com.cooba.enums.OrderEnum;
+
 public interface OrderNumGenerator {
 
-    String generate();
+    String generate(OrderEnum orderType);
 
 }

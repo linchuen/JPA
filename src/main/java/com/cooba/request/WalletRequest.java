@@ -11,7 +11,6 @@ import java.math.BigDecimal;
 public class WalletRequest {
     @NotNull
     private Long userId;
-    @NotBlank
     private String orderId;
     @NotNull
     private Integer assetId;
