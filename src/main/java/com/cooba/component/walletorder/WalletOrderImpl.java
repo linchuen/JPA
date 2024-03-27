@@ -28,7 +28,6 @@ public class WalletOrderImpl implements WalletOrder {
                 .amount(walletRequest.getAmount())
                 .transferType(transferType.getType())
                 .status(WalletStatusEnum.FAILED.getType())
-                .createdTime(LocalDateTime.now())
                 .build();
         walletRecordRepository.save(order);
         return order;

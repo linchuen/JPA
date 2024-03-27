@@ -32,7 +32,6 @@ public class DefaultWallet implements Wallet {
                     .orElseGet(() -> createNewWallet(userId, assetId));
             BigDecimal transferBalance = walletEntity.getBalance().add(amount);
             walletEntity.setBalance(transferBalance);
-            walletEntity.setUpdateTime(LocalDateTime.now());
             walletRepository.save(walletEntity);
             return WalletChangeResult.builder()
                     .transferBalance(transferBalance)
@@ -55,7 +54,6 @@ public class DefaultWallet implements Wallet {
             }
 
             walletEntity.setBalance(transferBalance);
-            walletEntity.setUpdateTime(LocalDateTime.now());
             walletRepository.save(walletEntity);
             return WalletChangeResult.builder()
                     .transferBalance(transferBalance)
@@ -64,13 +62,10 @@ public class DefaultWallet implements Wallet {
     }
 
     private WalletEntity createNewWallet(long userId, int assetId) {
-        LocalDateTime now = LocalDateTime.now();
         WalletEntity walletEntity = WalletEntity.builder()
                 .userId(userId)
                 .assetId(assetId)
                 .balance(BigDecimal.ZERO)
-                .createdTime(now)
-                .updateTime(now)
                 .build();
         return walletRepository.save(walletEntity);
     }

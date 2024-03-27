@@ -43,11 +43,8 @@ public class DefaultUser implements User {
 
     @Override
     public CreateUserResult create(CreateUserRequest createUserRequest) {
-        LocalDateTime now = LocalDateTime.now();
         UserEntity userEntity = UserEntity.builder()
                 .name(createUserRequest.getName())
-                .createdTime(now)
-                .updateTime(now)
                 .build();
         userRepository.save(userEntity);
         return CreateUserResult.builder()

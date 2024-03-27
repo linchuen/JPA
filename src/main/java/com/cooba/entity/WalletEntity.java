@@ -32,6 +32,8 @@ public class WalletEntity {
     private Long userId;
     private Integer assetId;
     private BigDecimal balance;
+    @CreatedDate
     private LocalDateTime createdTime;
+    @LastModifiedDate
     private LocalDateTime updateTime;
 }

@@ -4,6 +4,8 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
 
 import javax.persistence.*;
 import java.math.BigDecimal;
@@ -28,6 +30,8 @@ public class GoodsOrderEntity {
     private Integer status;
     @Version
     private Integer version;
+    @CreatedDate
     private LocalDateTime createdTime;
+    @LastModifiedDate
     private LocalDateTime updatedTime;
 }

@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.data.annotation.LastModifiedDate;
 
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -31,5 +32,6 @@ public class GoodsInventoryEntity {
     private Integer merchantId;
     private Long goodsId;
     private BigDecimal remainAmount;
-    private LocalDateTime updateTime;
+    @LastModifiedDate
+    private LocalDateTime updatedTime;
 }

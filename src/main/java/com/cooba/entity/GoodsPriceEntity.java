@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.data.annotation.LastModifiedDate;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -33,6 +34,7 @@ public class GoodsPriceEntity {
     private BigDecimal price;
     @Version
     private Integer version;
+    @LastModifiedDate
     private LocalDateTime updatedTime;
 
 }

@@ -39,11 +39,8 @@ public class ShopImpl implements Shop {
 
     @Override
     public CreateMerchantResult createMerchant(CreateMerchantRequest createMerchantRequest) {
-        LocalDateTime now = LocalDateTime.now();
         MerchantEntity merchantEntity = MerchantEntity.builder()
                 .name(createMerchantRequest.getName())
-                .createdTime(now)
-                .updateTime(now)
                 .build();
         merchantRepository.save(merchantEntity);
 
@@ -56,15 +53,12 @@ public class ShopImpl implements Shop {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public CreateGoodsResult createGoods(CreateGoodsRequest createGoodsRequest) {
-        LocalDateTime now = LocalDateTime.now();
         Integer merchantId = createGoodsRequest.getMerchantId();
         String name = createGoodsRequest.getName();
 
         GoodsEntity goodsEntity = GoodsEntity.builder()
                 .merchantId(merchantId)
                 .name(name)
-                .createdTime(now)
-                .updateTime(now)
                 .build();
         goodsRepository.save(goodsEntity);
 
@@ -115,7 +109,6 @@ public class ShopImpl implements Shop {
     }
 
     private void insertRecord(String orderId, Integer merchantId, Long goodsId, BigDecimal amount, GoodsTransferEnum transferType, InventoryChangeResult inventoryChangeResult) {
-        LocalDateTime now = LocalDateTime.now();
         GoodsRecordEntity record = GoodsRecordEntity.builder()
                 .orderId(orderId)
                 .merchantId(merchantId)
@@ -123,8 +116,6 @@ public class ShopImpl implements Shop {
                 .transferType(transferType.getType())
                 .changeAmount(amount)
                 .remainAmount(inventoryChangeResult.getRemainAmount())
-                .createdTime(now)
-                .updatedTime(now)
                 .build();
         goodsRecordRepository.save(record);
     }

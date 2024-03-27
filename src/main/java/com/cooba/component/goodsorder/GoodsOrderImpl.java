@@ -19,14 +19,11 @@ public class GoodsOrderImpl implements GoodsOrder {
     @Override
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRES_NEW)
     public GoodsOrderEntity create(String orderId, Long userId, UserTypeEnum userType) {
-        LocalDateTime now = LocalDateTime.now();
         GoodsOrderEntity order = GoodsOrderEntity.builder()
                 .orderId(orderId)
                 .userId(userId)
                 .userType(userType.getType())
                 .status(GoodsStatusEnum.FAILED.getType())
-                .createdTime(now)
-                .updatedTime(now)
                 .build();
         return goodsOrderRepository.save(order);
     }
@@ -34,7 +31,6 @@ public class GoodsOrderImpl implements GoodsOrder {
     @Override
     public void updateStatus(GoodsOrderEntity order) {
         order.setStatus(GoodsStatusEnum.SUCCEED.getType());
-        order.setUpdatedTime(LocalDateTime.now());
         goodsOrderRepository.save(order);
     }
 }

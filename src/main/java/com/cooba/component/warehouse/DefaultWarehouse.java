@@ -30,7 +30,6 @@ public class DefaultWarehouse implements Warehouse {
                     .orElseGet(() -> createNewInventory(merchantId, goodsId));
             BigDecimal remainAmount = goodsInventoryEntity.getRemainAmount().add(amount);
             goodsInventoryEntity.setRemainAmount(remainAmount);
-            goodsInventoryEntity.setUpdateTime(LocalDateTime.now());
             goodsInventoryRepository.save(goodsInventoryEntity);
             return InventoryChangeResult.builder()
                     .goodsId(goodsId)
@@ -53,7 +52,6 @@ public class DefaultWarehouse implements Warehouse {
             }
 
             goodsInventoryEntity.setRemainAmount(remainAmount);
-            goodsInventoryEntity.setUpdateTime(LocalDateTime.now());
             goodsInventoryRepository.save(goodsInventoryEntity);
             return InventoryChangeResult.builder()
                     .goodsId(goodsId)
@@ -67,7 +65,6 @@ public class DefaultWarehouse implements Warehouse {
                 .merchantId(merchantId)
                 .goodsId(goodsId)
                 .remainAmount(BigDecimal.ZERO)
-                .updateTime(LocalDateTime.now())
                 .build();
         return goodsInventoryRepository.save(goodsInventory);
     }

@@ -4,6 +4,8 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -26,6 +28,8 @@ public class MerchantEntity {
     @GeneratedValue(strategy= GenerationType.AUTO)
     private Integer id;
     private String name;
+    @CreatedDate
     private LocalDateTime createdTime;
+    @LastModifiedDate
     private LocalDateTime updateTime;
 }

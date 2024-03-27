@@ -5,6 +5,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -40,6 +41,8 @@ public class WalletOrderEntity {
     private Integer version;
     private BigDecimal amount;
     private BigDecimal transferBalance;
+    @CreatedDate
     private LocalDateTime createdTime;
+    @LastModifiedDate
     private LocalDateTime updatedTime;
 }

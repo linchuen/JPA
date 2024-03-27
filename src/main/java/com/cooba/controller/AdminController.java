@@ -19,12 +19,9 @@ public class AdminController {
 
     @PostMapping("/create")
     public BaseResponse<Boolean> create() {
-        LocalDateTime now = LocalDateTime.now();
         AdminEntity admin = AdminEntity.builder()
                 .id(1L)
                 .name("Admin")
-                .createdTime(now)
-                .updateTime(now)
                 .build();
         adminRepository.save(admin);
         return new SuccessResponse<>(true);
