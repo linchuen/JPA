@@ -1,9 +1,12 @@
 package com.cooba.controller;
 
+import com.cooba.request.CreateGoodsRequest;
 import com.cooba.request.WalletRequest;
 import com.cooba.response.BaseResponse;
 import com.cooba.response.SuccessResponse;
+import com.cooba.result.CreateGoodsResult;
 import com.cooba.result.WalletChangeResult;
+import com.cooba.service.goods.GoodsService;
 import com.cooba.service.user.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -17,12 +20,12 @@ import javax.validation.Valid;
 @RequestMapping("/goods")
 @RequiredArgsConstructor
 public class GoodsController {
-    private final UserService userService;
+    private final GoodsService goodsService;
 
     @PostMapping("/create")
-    public BaseResponse<WalletChangeResult> deposit(@Valid @RequestBody WalletRequest walletRequest){
-        WalletChangeResult changeResult = userService.deposit(walletRequest);
-        return new SuccessResponse<>(changeResult);
+    public BaseResponse<CreateGoodsResult> create(@Valid @RequestBody CreateGoodsRequest createGoodsRequest){
+        CreateGoodsResult goodsResult = goodsService.createGoods(createGoodsRequest);
+        return new SuccessResponse<>(goodsResult);
     }
 
 }

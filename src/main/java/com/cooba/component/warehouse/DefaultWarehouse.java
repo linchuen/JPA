@@ -60,7 +60,7 @@ public class DefaultWarehouse implements Warehouse {
         });
     }
 
-    private GoodsInventoryEntity createNewInventory(int merchantId, long goodsId) {
+    public GoodsInventoryEntity createNewInventory(int merchantId, long goodsId) {
         GoodsInventoryEntity goodsInventory = GoodsInventoryEntity.builder()
                 .merchantId(merchantId)
                 .goodsId(goodsId)

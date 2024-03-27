@@ -11,12 +11,18 @@ import com.cooba.enums.WarehouseEnum;
 import com.cooba.repository.GoodsRecordRepository;
 import com.cooba.repository.GoodsRepository;
 import com.cooba.repository.MerchantRepository;
-import com.cooba.request.*;
+import com.cooba.request.BuyRequest;
+import com.cooba.request.CreateGoodsRequest;
+import com.cooba.request.CreateMerchantRequest;
+import com.cooba.request.GoodsAmountRequest;
+import com.cooba.request.RestockRequest;
+import com.cooba.result.CreateGoodsResult;
 import com.cooba.result.CreateMerchantResult;
 import com.cooba.result.InventoryChangeResult;
 import com.cooba.result.PayResult;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -46,15 +52,29 @@ public class ShopImpl implements Shop {
     }
 
     @Override
-    public void createGoods(CreateGoodsRequest createGoodsRequest) {
+    @Transactional(rollbackFor = Exception.class)
+    public CreateGoodsResult createGoods(CreateGoodsRequest createGoodsRequest) {
         LocalDateTime now = LocalDateTime.now();
+        Integer merchantId = createGoodsRequest.getMerchantId();
+        String name = createGoodsRequest.getName();
+
         GoodsEntity goodsEntity = GoodsEntity.builder()
-                .merchantId(createGoodsRequest.getMerchantId())
-                .name(createGoodsRequest.getName())
+                .merchantId(merchantId)
+                .name(name)
                 .createdTime(now)
                 .updateTime(now)
                 .build();
         goodsRepository.save(goodsEntity);
+
+        Long goodsId = goodsEntity.getId();
+
+        Warehouse warehouse = warehouseFactory.getByEnum(WarehouseEnum.DEFAULT);
+        warehouse.createNewInventory(merchantId, goodsId);
+
+        return CreateGoodsResult.builder()
+                .goodsId(goodsId)
+                .name(name)
+                .build();
     }
 
     @Override
@@ -67,7 +87,7 @@ public class ShopImpl implements Shop {
             Long goodsId = goodsAmountRequest.getGoodsId();
             BigDecimal amount = goodsAmountRequest.getAmount();
 
-            InventoryChangeResult changeResult = warehouse.decreaseGoods(merchantId, goodsId, amount);
+            InventoryChangeResult changeResult = warehouse.increaseGoods(merchantId, goodsId, amount);
             insertRecord(orderId, merchantId, goodsId, amount, GoodsTransferEnum.SALE, changeResult);
         }
     }
