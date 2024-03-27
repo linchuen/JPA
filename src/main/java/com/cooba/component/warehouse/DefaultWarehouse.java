@@ -33,6 +33,7 @@ public class DefaultWarehouse implements Warehouse {
             goodsInventoryEntity.setUpdateTime(LocalDateTime.now());
             goodsInventoryRepository.save(goodsInventoryEntity);
             return InventoryChangeResult.builder()
+                    .goodsId(goodsId)
                     .remainAmount(remainAmount)
                     .build();
         });
@@ -55,6 +56,7 @@ public class DefaultWarehouse implements Warehouse {
             goodsInventoryEntity.setUpdateTime(LocalDateTime.now());
             goodsInventoryRepository.save(goodsInventoryEntity);
             return InventoryChangeResult.builder()
+                    .goodsId(goodsId)
                     .remainAmount(remainAmount)
                     .build();
         });

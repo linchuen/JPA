@@ -17,6 +17,7 @@ import com.cooba.request.CreateMerchantRequest;
 import com.cooba.request.RestockRequest;
 import com.cooba.result.CreateMerchantResult;
 import com.cooba.result.PayResult;
+import com.cooba.result.RestockResult;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -36,7 +37,7 @@ public class ShopServiceImpl implements ShopService {
     }
 
     @Override
-    public void restockGoods(RestockRequest restockRequest) {
+    public RestockResult restockGoods(RestockRequest restockRequest) {
         Long adminUserId = restockRequest.getAdminUserId();
         Integer merchantId = restockRequest.getMerchantId();
         String orderId = restockRequest.getOrderId();
@@ -46,8 +47,9 @@ public class ShopServiceImpl implements ShopService {
 
         GoodsOrderEntity order = goodsOrder.create(orderId, adminUserId, UserTypeEnum.ADMIN);
 
-        shop.restockGoods(restockRequest);
+        RestockResult restockResult = shop.restockGoods(restockRequest);
         goodsOrder.updateStatus(order);
+        return restockResult;
     }
 
     @Override

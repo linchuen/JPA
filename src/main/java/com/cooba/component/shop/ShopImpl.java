@@ -20,12 +20,14 @@ import com.cooba.result.CreateGoodsResult;
 import com.cooba.result.CreateMerchantResult;
 import com.cooba.result.InventoryChangeResult;
 import com.cooba.result.PayResult;
+import com.cooba.result.RestockResult;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Component
 @RequiredArgsConstructor
@@ -78,18 +80,23 @@ public class ShopImpl implements Shop {
     }
 
     @Override
-    public void restockGoods(RestockRequest restockRequest) {
+    public RestockResult restockGoods(RestockRequest restockRequest) {
         String orderId = restockRequest.getOrderId();
         Integer merchantId = restockRequest.getMerchantId();
 
         Warehouse warehouse = warehouseFactory.getByEnum(WarehouseEnum.DEFAULT);
-        for (GoodsAmountRequest goodsAmountRequest : restockRequest.getGoodsAmountRequests()) {
+
+        List<InventoryChangeResult> changeResults = restockRequest.getGoodsAmountRequests().stream().map(goodsAmountRequest -> {
             Long goodsId = goodsAmountRequest.getGoodsId();
             BigDecimal amount = goodsAmountRequest.getAmount();
 
             InventoryChangeResult changeResult = warehouse.increaseGoods(merchantId, goodsId, amount);
             insertRecord(orderId, merchantId, goodsId, amount, GoodsTransferEnum.RESTOCK, changeResult);
-        }
+            return changeResult;
+        }).toList();
+        return RestockResult.builder()
+                .changeResults(changeResults)
+                .build();
     }
 
     @Override

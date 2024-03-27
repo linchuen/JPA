@@ -5,6 +5,7 @@ import com.cooba.request.*;
 import com.cooba.result.CreateGoodsResult;
 import com.cooba.result.CreateMerchantResult;
 import com.cooba.result.PayResult;
+import com.cooba.result.RestockResult;
 
 public interface Shop {
 
@@ -12,7 +13,7 @@ public interface Shop {
 
     CreateGoodsResult createGoods(CreateGoodsRequest createGoodsRequest);
 
-    void restockGoods(RestockRequest restockRequest);
+    RestockResult restockGoods(RestockRequest restockRequest);
 
     void sendGoods(PayResult payResult, BuyRequest buyRequest);
 }
