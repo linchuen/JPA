@@ -11,6 +11,7 @@ import com.cooba.entity.MerchantEntity;
 import com.cooba.enums.AssetEnum;
 import com.cooba.enums.GoodsTransferEnum;
 import com.cooba.enums.WarehouseEnum;
+import com.cooba.repository.GoodsPriceRepository;
 import com.cooba.repository.GoodsRecordRepository;
 import com.cooba.repository.GoodsRepository;
 import com.cooba.repository.MerchantRepository;
@@ -19,12 +20,12 @@ import com.cooba.request.CreateGoodsRequest;
 import com.cooba.request.CreateMerchantRequest;
 import com.cooba.request.GoodsAmountRequest;
 import com.cooba.request.RestockRequest;
-import com.cooba.request.UpdatePriceRequest;
 import com.cooba.result.CreateGoodsResult;
 import com.cooba.result.CreateMerchantResult;
 import com.cooba.result.InventoryChangeResult;
 import com.cooba.result.PayResult;
 import com.cooba.result.RestockResult;
+import com.cooba.result.UpdatePriceResult;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -37,6 +38,7 @@ import java.util.List;
 public class ShopImpl implements Shop {
     private final MerchantRepository merchantRepository;
     private final GoodsRepository goodsRepository;
+    private final GoodsPriceRepository goodsPriceRepository;
     private final GoodsRecordRepository goodsRecordRepository;
     private final WarehouseFactory warehouseFactory;
 
@@ -114,8 +116,20 @@ public class ShopImpl implements Shop {
     }
 
     @Override
-    public void updateGoodsPrice(UpdatePriceRequest updatePriceRequest) {
+    public UpdatePriceResult updateGoodsPrice(Long goodsId, Integer assetId, BigDecimal price) {
+        GoodsPriceEntity goodsPrice = goodsPriceRepository.findByGoodsIdAndAssetId(goodsId, assetId)
+                .orElse(GoodsPriceEntity.builder()
+                        .goods(GoodsEntity.builder().id(goodsId).build())
+                        .assetId(assetId)
+                        .build());
+        goodsPrice.setPrice(price);
+        goodsPriceRepository.save(goodsPrice);
 
+        return UpdatePriceResult.builder()
+                .goodsId(goodsId)
+                .assetId(assetId)
+                .price(goodsPrice.getPrice())
+                .build();
     }
 
     @Override

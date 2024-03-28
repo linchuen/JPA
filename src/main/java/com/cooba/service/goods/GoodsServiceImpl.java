@@ -6,11 +6,14 @@ import com.cooba.exception.MerchantNotExistException;
 import com.cooba.repository.GoodsRepository;
 import com.cooba.repository.MerchantRepository;
 import com.cooba.request.CreateGoodsRequest;
+import com.cooba.request.UpdatePriceRequest;
 import com.cooba.response.GoodsResponse;
 import com.cooba.result.CreateGoodsResult;
+import com.cooba.result.UpdatePriceResult;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 @Service
@@ -25,6 +28,14 @@ public class GoodsServiceImpl implements GoodsService {
         merchantRepository.findById(merchantId).orElseThrow(MerchantNotExistException::new);
 
         return shop.createGoods(createGoodsRequest);
+    }
+
+    @Override
+    public UpdatePriceResult updatePrice(UpdatePriceRequest updatePriceRequest) {
+        Long goodsId = updatePriceRequest.getGoodsId();
+        Integer assetId = updatePriceRequest.getAssetId();
+        BigDecimal price = updatePriceRequest.getPrice();
+        return shop.updateGoodsPrice(goodsId, assetId, price);
     }
 
     @Override

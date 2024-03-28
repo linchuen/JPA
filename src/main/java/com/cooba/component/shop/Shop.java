@@ -6,6 +6,9 @@ import com.cooba.result.CreateGoodsResult;
 import com.cooba.result.CreateMerchantResult;
 import com.cooba.result.PayResult;
 import com.cooba.result.RestockResult;
+import com.cooba.result.UpdatePriceResult;
+
+import java.math.BigDecimal;
 
 public interface Shop {
 
@@ -15,7 +18,7 @@ public interface Shop {
 
     RestockResult restockGoods(RestockRequest restockRequest);
 
-    void updateGoodsPrice(UpdatePriceRequest updatePriceRequest);
+    UpdatePriceResult updateGoodsPrice(Long goodsId, Integer assetId, BigDecimal price);
 
     void sendGoods(PayResult payResult, BuyRequest buyRequest);
 }
