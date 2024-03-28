@@ -1,5 +1,9 @@
 package com.cooba.entity;
 
+import com.cooba.enums.GoodsStatusEnum;
+import com.cooba.enums.UserTypeEnum;
+import com.cooba.enums.converter.GoodsStatusConverter;
+import com.cooba.enums.converter.UserTypeConverter;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -28,8 +32,10 @@ public class GoodsOrderEntity {
     private Long id;
     private String orderId;
     private Long userId;
-    private Integer userType;
-    private Integer status;
+    @Convert(converter = UserTypeConverter.class)
+    private UserTypeEnum userType;
+    @Convert(converter = GoodsStatusConverter.class)
+    private GoodsStatusEnum status;
     @Version
     private Integer version;
     @CreatedDate

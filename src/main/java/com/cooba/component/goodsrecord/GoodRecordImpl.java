@@ -22,7 +22,7 @@ public class GoodRecordImpl implements GoodsRecord {
                 .orderId(orderId)
                 .merchantId(merchantId)
                 .goodsId(goodsId)
-                .transferType(transferType.getType())
+                .transferType(transferType)
                 .changeAmount(isSale ? amount.negate() : amount)
                 .remainAmount(inventoryChangeResult.getRemainAmount())
                 .build();

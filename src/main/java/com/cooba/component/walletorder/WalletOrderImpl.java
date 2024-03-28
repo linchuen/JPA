@@ -29,8 +29,8 @@ public class WalletOrderImpl implements WalletOrder {
                 .userId(walletRequest.getUserId())
                 .assetId(walletRequest.getAssetId())
                 .amount(isWithdraw ? amount.negate() : amount)
-                .transferType(transferType.getType())
-                .status(WalletStatusEnum.FAILED.getType())
+                .transferType(transferType)
+                .status(WalletStatusEnum.FAILED)
                 .build();
         walletRecordRepository.save(order);
         return order;
@@ -39,7 +39,7 @@ public class WalletOrderImpl implements WalletOrder {
     @Override
     public void updateStatus(WalletOrderEntity order, WalletChangeResult walletChangeResult) {
         order.setTransferBalance(walletChangeResult.getTransferBalance());
-        order.setStatus(WalletStatusEnum.SUCCEED.getType());
+        order.setStatus(WalletStatusEnum.SUCCEED);
         walletRecordRepository.save(order);
     }
 }

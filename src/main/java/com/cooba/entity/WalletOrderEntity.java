@@ -1,5 +1,10 @@
 package com.cooba.entity;
 
+import com.cooba.enums.WalletStatusEnum;
+import com.cooba.enums.WalletTransferEnum;
+import com.cooba.enums.converter.GoodsTransferConverter;
+import com.cooba.enums.converter.WalletStatusConverter;
+import com.cooba.enums.converter.WalletTransferConverter;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -8,15 +13,7 @@ import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
-import javax.persistence.Entity;
-import javax.persistence.EntityListeners;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.Index;
-import javax.persistence.Table;
-import javax.persistence.UniqueConstraint;
-import javax.persistence.Version;
+import javax.persistence.*;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
@@ -38,8 +35,10 @@ public class WalletOrderEntity {
     private String orderId;
     private Long userId;
     private Integer assetId;
-    private Integer transferType;
-    private Integer status;
+    @Convert(converter = WalletTransferConverter.class)
+    private WalletTransferEnum transferType;
+    @Convert(converter = WalletStatusConverter.class)
+    private WalletStatusEnum status;
     @Version
     private Integer version;
     private BigDecimal amount;
