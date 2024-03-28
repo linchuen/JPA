@@ -11,6 +11,7 @@ import com.cooba.entity.MerchantEntity;
 import com.cooba.enums.AssetEnum;
 import com.cooba.enums.GoodsTransferEnum;
 import com.cooba.enums.WarehouseEnum;
+import com.cooba.repository.GoodsPriceRepository;
 import com.cooba.repository.GoodsRecordRepository;
 import com.cooba.repository.GoodsRepository;
 import com.cooba.repository.MerchantRepository;
@@ -19,12 +20,12 @@ import com.cooba.request.CreateGoodsRequest;
 import com.cooba.request.CreateMerchantRequest;
 import com.cooba.request.GoodsAmountRequest;
 import com.cooba.request.RestockRequest;
-import com.cooba.request.UpdatePriceRequest;
 import com.cooba.result.CreateGoodsResult;
 import com.cooba.result.CreateMerchantResult;
 import com.cooba.result.InventoryChangeResult;
 import com.cooba.result.PayResult;
 import com.cooba.result.RestockResult;
+import com.cooba.result.UpdatePriceResult;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -37,20 +38,19 @@ import java.util.List;
 public class ShopImpl implements Shop {
     private final MerchantRepository merchantRepository;
     private final GoodsRepository goodsRepository;
+    private final GoodsPriceRepository goodsPriceRepository;
     private final GoodsRecordRepository goodsRecordRepository;
     private final WarehouseFactory warehouseFactory;
 
     @Override
     public CreateMerchantResult createMerchant(CreateMerchantRequest createMerchantRequest) {
-        MerchantEntity merchantEntity = MerchantEntity.builder()
-                .name(createMerchantRequest.getName())
-                .build();
+        MerchantEntity merchantEntity = new MerchantEntity()
+                .name(createMerchantRequest.getName());
         merchantRepository.save(merchantEntity);
 
-        return CreateMerchantResult.builder()
-                .id(merchantEntity.getId())
-                .name(merchantEntity.getName())
-                .build();
+        return new CreateMerchantResult()
+                .id(merchantEntity.id())
+                .name(merchantEntity.name());
     }
 
     @Override
@@ -61,36 +61,32 @@ public class ShopImpl implements Shop {
         BigDecimal price = createGoodsRequest.getPrice();
         Integer assetId = createGoodsRequest.getAssetId();
 
-        GoodsEntity goodsEntity = GoodsEntity.builder()
+        GoodsEntity goodsEntity = new GoodsEntity()
                 .merchantId(merchantId)
-                .name(name)
-                .build();
-        GoodsInventoryEntity initInventory = GoodsInventoryEntity.builder()
+                .name(name);
+        GoodsInventoryEntity initInventory = new GoodsInventoryEntity()
                 .remainAmount(BigDecimal.ZERO)
-                .goods(goodsEntity)
-                .build();
-        goodsEntity.setInventory(initInventory);
+                .goods(goodsEntity);
+        goodsEntity.inventory(initInventory);
 
         String assetName = null;
         if (price != null && assetId != null && price.compareTo(BigDecimal.ZERO) > 0) {
             assetName = AssetEnum.getEnum(assetId).orElseThrow().name();
-            GoodsPriceEntity goodsPrice = GoodsPriceEntity.builder()
+            GoodsPriceEntity goodsPrice = new GoodsPriceEntity()
                     .goods(goodsEntity)
                     .assetId(assetId)
-                    .price(price)
-                    .build();
-            goodsEntity.setPrice(List.of(goodsPrice));
+                    .price(price);
+            goodsEntity.price(List.of(goodsPrice));
         }
 
         goodsRepository.save(goodsEntity);
 
-        return CreateGoodsResult.builder()
-                .goodsId(goodsEntity.getId())
+        return new CreateGoodsResult()
+                .goodsId(goodsEntity.id())
                 .name(name)
                 .assetId(assetId)
                 .assetName(assetName)
-                .price(price)
-                .build();
+                .price(price);
     }
 
     @Override
@@ -108,14 +104,22 @@ public class ShopImpl implements Shop {
             insertRecord(orderId, merchantId, goodsId, amount, GoodsTransferEnum.RESTOCK, changeResult);
             return changeResult;
         }).toList();
-        return RestockResult.builder()
-                .changeResults(changeResults)
-                .build();
+        return new RestockResult()
+                .changeResults(changeResults);
     }
 
     @Override
-    public void updateGoodsPrice(UpdatePriceRequest updatePriceRequest) {
+    public UpdatePriceResult updateGoodsPrice(Long goodsId, Integer assetId, BigDecimal price) {
+        GoodsPriceEntity goodsPrice = new GoodsPriceEntity()
+                .goods(new GoodsEntity().id(goodsId))
+                .price(price)
+                .assetId(assetId);
+        goodsPriceRepository.save(goodsPrice);
 
+        return new UpdatePriceResult()
+                .goodsId(goodsId)
+                .assetId(assetId)
+                .price(price);
     }
 
     @Override
@@ -134,14 +138,13 @@ public class ShopImpl implements Shop {
     }
 
     private void insertRecord(String orderId, Integer merchantId, Long goodsId, BigDecimal amount, GoodsTransferEnum transferType, InventoryChangeResult inventoryChangeResult) {
-        GoodsRecordEntity record = GoodsRecordEntity.builder()
+        GoodsRecordEntity record = new GoodsRecordEntity()
                 .orderId(orderId)
                 .merchantId(merchantId)
                 .goodsId(goodsId)
                 .transferType(transferType.getType())
                 .changeAmount(amount)
-                .remainAmount(inventoryChangeResult.getRemainAmount())
-                .build();
+                .remainAmount(inventoryChangeResult.remainAmount());
         goodsRecordRepository.save(record);
     }
 

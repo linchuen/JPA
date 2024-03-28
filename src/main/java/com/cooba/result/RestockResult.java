@@ -1,12 +1,12 @@
 package com.cooba.result;
 
-import lombok.Builder;
 import lombok.Data;
+import lombok.experimental.Accessors;
 
 import java.util.List;
 
 @Data
-@Builder
+@Accessors(fluent = true)
 public class RestockResult {
-   private final List<InventoryChangeResult> changeResults;
+   private List<InventoryChangeResult> changeResults;
 }

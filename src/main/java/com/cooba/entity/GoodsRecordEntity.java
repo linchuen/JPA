@@ -1,9 +1,7 @@
 package com.cooba.entity;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.experimental.Accessors;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
@@ -20,9 +18,7 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Data
-@NoArgsConstructor
-@AllArgsConstructor
-@Builder
+@Accessors(fluent = true)
 @Entity(name = "goods_record")
 @Table(uniqueConstraints = {
         @UniqueConstraint(name = "unique_name", columnNames = {"orderId", "goodsId", "transferType"}),

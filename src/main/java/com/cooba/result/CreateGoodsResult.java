@@ -1,12 +1,12 @@
 package com.cooba.result;
 
-import lombok.Builder;
 import lombok.Data;
+import lombok.experimental.Accessors;
 
 import java.math.BigDecimal;
 
 @Data
-@Builder
+@Accessors(fluent = true)
 public class CreateGoodsResult {
     private Long goodsId;
     private String name;

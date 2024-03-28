@@ -21,22 +21,21 @@ public class WalletOrderImpl implements WalletOrder {
     @Override
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRES_NEW)
     public WalletOrderEntity create(WalletRequest walletRequest, WalletTransferEnum transferType) {
-        WalletOrderEntity order = WalletOrderEntity.builder()
+        WalletOrderEntity order = new WalletOrderEntity()
                 .orderId(walletRequest.getOrderId())
                 .userId(walletRequest.getUserId())
                 .assetId(walletRequest.getAssetId())
                 .amount(walletRequest.getAmount())
                 .transferType(transferType.getType())
-                .status(WalletStatusEnum.FAILED.getType())
-                .build();
+                .status(WalletStatusEnum.FAILED.getType());
         walletRecordRepository.save(order);
         return order;
     }
 
     @Override
     public void updateStatus(WalletOrderEntity order, WalletChangeResult walletChangeResult) {
-        order.setTransferBalance(walletChangeResult.getTransferBalance());
-        order.setStatus(WalletStatusEnum.SUCCEED.getType());
+        order.transferBalance(walletChangeResult.transferBalance());
+        order.status(WalletStatusEnum.SUCCEED.getType());
         walletRecordRepository.save(order);
     }
 }

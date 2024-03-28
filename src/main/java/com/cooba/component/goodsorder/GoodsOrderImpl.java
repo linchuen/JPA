@@ -9,8 +9,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
-
 @Component
 @RequiredArgsConstructor
 public class GoodsOrderImpl implements GoodsOrder {
@@ -19,18 +17,17 @@ public class GoodsOrderImpl implements GoodsOrder {
     @Override
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRES_NEW)
     public GoodsOrderEntity create(String orderId, Long userId, UserTypeEnum userType) {
-        GoodsOrderEntity order = GoodsOrderEntity.builder()
+        GoodsOrderEntity order = new GoodsOrderEntity()
                 .orderId(orderId)
                 .userId(userId)
                 .userType(userType.getType())
-                .status(GoodsStatusEnum.FAILED.getType())
-                .build();
+                .status(GoodsStatusEnum.FAILED.getType());
         return goodsOrderRepository.save(order);
     }
 
     @Override
     public void updateStatus(GoodsOrderEntity order) {
-        order.setStatus(GoodsStatusEnum.SUCCEED.getType());
+        order.status(GoodsStatusEnum.SUCCEED.getType());
         goodsOrderRepository.save(order);
     }
 }

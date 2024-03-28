@@ -10,7 +10,6 @@ import com.cooba.util.lock.CustomLock;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
@@ -31,12 +30,11 @@ public class DefaultWallet implements Wallet {
         return customLock.tryLock(key, 1, TimeUnit.SECONDS, () -> {
             WalletEntity walletEntity = walletRepository.findByUserIdAndAssetId(userId, assetId)
                     .orElseGet(() -> createNewWallet(userId, assetId));
-            BigDecimal transferBalance = walletEntity.getBalance().add(amount);
-            walletEntity.setBalance(transferBalance);
+            BigDecimal transferBalance = walletEntity.balance().add(amount);
+            walletEntity.balance(transferBalance);
             walletRepository.save(walletEntity);
-            return WalletChangeResult.builder()
-                    .transferBalance(transferBalance)
-                    .build();
+            return new WalletChangeResult()
+                    .transferBalance(transferBalance);
         });
     }
 
@@ -48,26 +46,24 @@ public class DefaultWallet implements Wallet {
         return customLock.tryLock(key, 1, TimeUnit.SECONDS, () -> {
             WalletEntity walletEntity = walletRepository.findByUserIdAndAssetId(userId, assetId)
                     .orElseThrow(InsufficientBalanceException::new);
-            BigDecimal transferBalance = walletEntity.getBalance().subtract(amount);
+            BigDecimal transferBalance = walletEntity.balance().subtract(amount);
 
             if (transferBalance.compareTo(BigDecimal.ZERO) < 0) {
                 throw new InsufficientBalanceException();
             }
 
-            walletEntity.setBalance(transferBalance);
+            walletEntity.balance(transferBalance);
             walletRepository.save(walletEntity);
-            return WalletChangeResult.builder()
-                    .transferBalance(transferBalance)
-                    .build();
+            return new WalletChangeResult()
+                    .transferBalance(transferBalance);
         });
     }
 
     private WalletEntity createNewWallet(long userId, int assetId) {
-        WalletEntity walletEntity = WalletEntity.builder()
-                .user(UserEntity.builder().id(userId).build())
+        WalletEntity walletEntity = new WalletEntity()
+                .user(new UserEntity().id(userId))
                 .assetId(assetId)
-                .balance(BigDecimal.ZERO)
-                .build();
+                .balance(BigDecimal.ZERO);
         return walletRepository.save(walletEntity);
     }
 

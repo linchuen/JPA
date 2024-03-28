@@ -27,13 +27,12 @@ public class DefaultWarehouse implements Warehouse {
         return customLock.tryLock(key, 1, TimeUnit.SECONDS, () -> {
             GoodsInventoryEntity goodsInventoryEntity = goodsInventoryRepository.findByGoodsId(goodsId)
                     .orElseGet(() -> createNewInventory(goodsId));
-            BigDecimal remainAmount = goodsInventoryEntity.getRemainAmount().add(amount);
-            goodsInventoryEntity.setRemainAmount(remainAmount);
+            BigDecimal remainAmount = goodsInventoryEntity.remainAmount().add(amount);
+            goodsInventoryEntity.remainAmount(remainAmount);
             goodsInventoryRepository.save(goodsInventoryEntity);
-            return InventoryChangeResult.builder()
+            return new InventoryChangeResult()
                     .goodsId(goodsId)
-                    .remainAmount(remainAmount)
-                    .build();
+                    .remainAmount(remainAmount);
         });
     }
 
@@ -44,25 +43,23 @@ public class DefaultWarehouse implements Warehouse {
         return customLock.tryLock(key, 1, TimeUnit.SECONDS, () -> {
             GoodsInventoryEntity goodsInventoryEntity = goodsInventoryRepository.findByGoodsId(goodsId)
                     .orElseGet(() -> createNewInventory(goodsId));
-            BigDecimal remainAmount = goodsInventoryEntity.getRemainAmount().subtract(amount);
+            BigDecimal remainAmount = goodsInventoryEntity.remainAmount().subtract(amount);
 
             if (remainAmount.compareTo(BigDecimal.ZERO) < 0) {
                 throw new InsufficientBalanceException();
             }
 
-            goodsInventoryEntity.setRemainAmount(remainAmount);
+            goodsInventoryEntity.remainAmount(remainAmount);
             goodsInventoryRepository.save(goodsInventoryEntity);
-            return InventoryChangeResult.builder()
+            return new InventoryChangeResult()
                     .goodsId(goodsId)
-                    .remainAmount(remainAmount)
-                    .build();
+                    .remainAmount(remainAmount);
         });
     }
 
     public GoodsInventoryEntity createNewInventory(long goodsId) {
-        GoodsInventoryEntity goodsInventory = GoodsInventoryEntity.builder()
-                .remainAmount(BigDecimal.ZERO)
-                .build();
+        GoodsInventoryEntity goodsInventory = new GoodsInventoryEntity()
+                .remainAmount(BigDecimal.ZERO);
         return goodsInventoryRepository.save(goodsInventory);
     }
 
