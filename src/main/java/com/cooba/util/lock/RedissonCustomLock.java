@@ -17,9 +17,10 @@ public class RedissonCustomLock implements CustomLock {
     @Override
     public void tryLock(String key, long leaseTime, TimeUnit unit, Runnable runnable) {
         RLock lock = redissonClient.getLock(key);
+        long waitTime = unit.toMillis(leaseTime);
 
         try {
-            if (lock.tryLock(3000L, leaseTime, unit)) {
+            if (lock.tryLock(waitTime, leaseTime, unit)) {
                 try {
                     runnable.run();
                 } finally {
@@ -36,11 +37,12 @@ public class RedissonCustomLock implements CustomLock {
     @Override
     public <T> T tryLock(String key, long leaseTime, TimeUnit unit, Supplier<T> supplier) {
         RLock lock = redissonClient.getLock(key);
+        long waitTime = unit.toMillis(leaseTime);
 
         try {
-            if (lock.tryLock(3000L, leaseTime, unit)) {
+            if (lock.tryLock(waitTime, leaseTime, unit)) {
                 try {
-                   return supplier.get();
+                    return supplier.get();
                 } finally {
                     lock.unlock();
                 }

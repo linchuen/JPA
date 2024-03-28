@@ -96,6 +96,7 @@ public class ShopImpl implements Shop {
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public RestockResult restockGoods(RestockRequest restockRequest) {
         String orderId = restockRequest.getOrderId();
         Integer merchantId = restockRequest.getMerchantId();

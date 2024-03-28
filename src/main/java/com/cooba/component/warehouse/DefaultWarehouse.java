@@ -9,6 +9,7 @@ import com.cooba.util.lock.CustomLock;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.util.concurrent.TimeUnit;
@@ -21,10 +22,11 @@ public class DefaultWarehouse implements Warehouse {
     private final CustomLock customLock;
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public InventoryChangeResult increaseGoods(long goodsId, BigDecimal amount) {
         String key = this.getEnum().name() + goodsId;
 
-        return customLock.tryLock(key, 1, TimeUnit.SECONDS, () -> {
+        return customLock.tryLock(key, 3, TimeUnit.SECONDS, () -> {
             GoodsInventoryEntity goodsInventoryEntity = goodsInventoryRepository.findByGoodsId(goodsId)
                     .orElseGet(() -> createNewInventory(goodsId));
             BigDecimal remainAmount = goodsInventoryEntity.getRemainAmount().add(amount);
@@ -38,10 +40,11 @@ public class DefaultWarehouse implements Warehouse {
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public InventoryChangeResult decreaseGoods(long goodsId, BigDecimal amount) {
         String key = this.getEnum().name() + goodsId;
 
-        return customLock.tryLock(key, 1, TimeUnit.SECONDS, () -> {
+        return customLock.tryLock(key, 3, TimeUnit.SECONDS, () -> {
             GoodsInventoryEntity goodsInventoryEntity = goodsInventoryRepository.findByGoodsId(goodsId)
                     .orElseGet(() -> createNewInventory(goodsId));
             BigDecimal remainAmount = goodsInventoryEntity.getRemainAmount().subtract(amount);

@@ -93,6 +93,7 @@ public class DefaultUser implements User {
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public PayResult pay(BuyRequest buyRequest) {
         Long userId = buyRequest.getUserId();
         Integer paymentAssetId = buyRequest.getPaymentAssetId();

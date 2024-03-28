@@ -28,7 +28,7 @@ public class DefaultWallet implements Wallet {
     public WalletChangeResult increaseAsset(long userId, int assetId, BigDecimal amount) {
         String key = this.getEnum().name() + userId + assetId;
 
-        return customLock.tryLock(key, 1, TimeUnit.SECONDS, () -> {
+        return customLock.tryLock(key, 3, TimeUnit.SECONDS, () -> {
             WalletEntity walletEntity = walletRepository.findByUserIdAndAssetId(userId, assetId)
                     .orElseGet(() -> createNewWallet(userId, assetId));
             BigDecimal transferBalance = walletEntity.getBalance().add(amount);
@@ -45,7 +45,7 @@ public class DefaultWallet implements Wallet {
     public WalletChangeResult decreaseAsset(long userId, int assetId, BigDecimal amount) {
         String key = this.getEnum().name() + userId + assetId;
 
-        return customLock.tryLock(key, 1, TimeUnit.SECONDS, () -> {
+        return customLock.tryLock(key, 3, TimeUnit.SECONDS, () -> {
             WalletEntity walletEntity = walletRepository.findByUserIdAndAssetId(userId, assetId)
                     .orElseThrow(InsufficientBalanceException::new);
             BigDecimal transferBalance = walletEntity.getBalance().subtract(amount);
