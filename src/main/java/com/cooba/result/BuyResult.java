@@ -13,5 +13,5 @@ public class BuyResult {
     private BigDecimal transferBalance;
     private BigDecimal totalPrice;
 
-    private List<SendGoodsResult.SendGoodInfo> sendGoodInfoList
+    private List<SendGoodsResult.SendGoodInfo> sendGoodInfoList;
 }
