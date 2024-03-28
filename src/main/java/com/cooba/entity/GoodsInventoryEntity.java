@@ -1,5 +1,7 @@
 package com.cooba.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -16,6 +18,7 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
+import javax.persistence.UniqueConstraint;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
@@ -24,7 +27,9 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @Builder
 @Entity(name = "goods_inventory")
-@Table
+@Table(uniqueConstraints = {
+        @UniqueConstraint(name = "unique_key", columnNames = "goods_id"),
+})
 @EntityListeners(AuditingEntityListener.class)
 public class GoodsInventoryEntity {
     @Id
@@ -34,7 +39,8 @@ public class GoodsInventoryEntity {
     @LastModifiedDate
     private LocalDateTime updatedTime;
 
+    @JsonManagedReference
     @OneToOne
-    @JoinColumn(name = "goods_id", foreignKey = @ForeignKey(name = "goods_fk"))
+    @JoinColumn(name = "goods_id")
     private GoodsEntity goods;
 }

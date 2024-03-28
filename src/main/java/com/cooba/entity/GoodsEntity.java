@@ -1,5 +1,7 @@
 package com.cooba.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -42,9 +44,11 @@ public class GoodsEntity {
     @LastModifiedDate
     private LocalDateTime updatedTime;
 
+    @JsonBackReference
     @OneToOne(cascade = CascadeType.ALL, mappedBy = "goods", fetch = FetchType.EAGER)
     private GoodsInventoryEntity inventory;
 
+    @JsonBackReference
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "goods", fetch = FetchType.EAGER)
     private List<GoodsPriceEntity> price;
 }

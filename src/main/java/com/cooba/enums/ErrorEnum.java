@@ -13,6 +13,7 @@ public enum ErrorEnum {
     PARAMETER_NOT_VALID(7,"參數不服"),
     MERCHANT_NOT_EXIST(8,"商戶不存在"),
     ADMIN_NOT_EXIST(9,"管理者不存在"),
+    GOODS_NOT_EXIST(10,"商品不存在"),
     INTERNAL_ERROR(9999,"內部錯誤");
 
     private final int code;

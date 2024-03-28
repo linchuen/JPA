@@ -6,7 +6,9 @@ import com.cooba.component.walletorder.WalletOrder;
 import com.cooba.entity.GoodsEntity;
 import com.cooba.entity.GoodsPriceEntity;
 import com.cooba.entity.UserEntity;
+import com.cooba.entity.WalletEntity;
 import com.cooba.entity.WalletOrderEntity;
+import com.cooba.enums.AssetEnum;
 import com.cooba.enums.OrderEnum;
 import com.cooba.enums.UserEnum;
 import com.cooba.enums.WalletEnum;
@@ -46,6 +48,13 @@ public class DefaultUser implements User {
         UserEntity userEntity = UserEntity.builder()
                 .name(createUserRequest.getName())
                 .build();
+        WalletEntity walletEntity = WalletEntity.builder()
+                .assetId(AssetEnum.TWD.getId())
+                .balance(BigDecimal.ZERO)
+                .user(userEntity)
+                .build();
+        userEntity.setWallet(List.of(walletEntity));
+
         userRepository.save(userEntity);
         return CreateUserResult.builder()
                 .id(userEntity.getId())
@@ -92,7 +101,7 @@ public class DefaultUser implements User {
                 .collect(Collectors.toMap(
                         GoodsAmountRequest::getGoodsId,
                         GoodsAmountRequest::getAmount));
-        List<GoodsEntity> goodsEntities = goodsRepository.findByGoodsIdIn(idAmountMap.keySet());
+        List<GoodsEntity> goodsEntities = goodsRepository.findAllById(idAmountMap.keySet());
 
         boolean isEmptyStock = goodsEntities.stream().map(GoodsEntity::getInventory)
                 .anyMatch(inventory -> inventory.getRemainAmount().compareTo(BigDecimal.ZERO) == 0);

@@ -1,5 +1,6 @@
 package com.cooba.component.wallet;
 
+import com.cooba.entity.UserEntity;
 import com.cooba.entity.WalletEntity;
 import com.cooba.enums.WalletEnum;
 import com.cooba.exception.InsufficientBalanceException;
@@ -9,10 +10,10 @@ import com.cooba.util.lock.CustomLock;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
 import java.util.concurrent.TimeUnit;
 
 @Slf4j
@@ -46,7 +47,7 @@ public class DefaultWallet implements Wallet {
 
         return customLock.tryLock(key, 1, TimeUnit.SECONDS, () -> {
             WalletEntity walletEntity = walletRepository.findByUserIdAndAssetId(userId, assetId)
-                    .orElseGet(() -> createNewWallet(userId, assetId));
+                    .orElseThrow(InsufficientBalanceException::new);
             BigDecimal transferBalance = walletEntity.getBalance().subtract(amount);
 
             if (transferBalance.compareTo(BigDecimal.ZERO) < 0) {
@@ -63,7 +64,7 @@ public class DefaultWallet implements Wallet {
 
     private WalletEntity createNewWallet(long userId, int assetId) {
         WalletEntity walletEntity = WalletEntity.builder()
-                .userId(userId)
+                .user(UserEntity.builder().id(userId).build())
                 .assetId(assetId)
                 .balance(BigDecimal.ZERO)
                 .build();

@@ -8,5 +8,4 @@ import java.util.List;
 
 public interface GoodsRepository extends JpaRepository<GoodsEntity, Long> {
 
-    List<GoodsEntity> findByGoodsIdIn(Collection<Long> goodsIds);
 }

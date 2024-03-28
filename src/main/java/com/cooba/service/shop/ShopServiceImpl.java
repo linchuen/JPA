@@ -4,22 +4,28 @@ import com.cooba.component.goodsorder.GoodsOrder;
 import com.cooba.component.shop.Shop;
 import com.cooba.component.user.User;
 import com.cooba.component.user.UserFactory;
+import com.cooba.entity.GoodsEntity;
 import com.cooba.entity.GoodsOrderEntity;
 import com.cooba.enums.UserEnum;
 import com.cooba.enums.UserTypeEnum;
+import com.cooba.exception.GoodsNotExistException;
 import com.cooba.exception.MerchantNotExistException;
 import com.cooba.exception.UserNotExistException;
 import com.cooba.repository.AdminRepository;
+import com.cooba.repository.GoodsRepository;
 import com.cooba.repository.MerchantRepository;
 import com.cooba.repository.UserRepository;
 import com.cooba.request.BuyRequest;
 import com.cooba.request.CreateMerchantRequest;
+import com.cooba.request.GoodsAmountRequest;
 import com.cooba.request.RestockRequest;
 import com.cooba.result.CreateMerchantResult;
 import com.cooba.result.PayResult;
 import com.cooba.result.RestockResult;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -30,6 +36,7 @@ public class ShopServiceImpl implements ShopService {
     private final UserRepository userRepository;
     private final AdminRepository adminRepository;
     private final MerchantRepository merchantRepository;
+    private final GoodsRepository goodsRepository;
 
     @Override
     public CreateMerchantResult createMerchant(CreateMerchantRequest createMerchantRequest) {
@@ -41,9 +48,16 @@ public class ShopServiceImpl implements ShopService {
         Long adminUserId = restockRequest.getAdminUserId();
         Integer merchantId = restockRequest.getMerchantId();
         String orderId = restockRequest.getOrderId();
+        List<Long> goodsIds = restockRequest.getGoodsAmountRequests().stream()
+                .map(GoodsAmountRequest::getGoodsId)
+                .toList();
 
         adminRepository.findById(adminUserId).orElseThrow(UserNotExistException::new);
         merchantRepository.findById(merchantId).orElseThrow(MerchantNotExistException::new);
+        List<GoodsEntity> goodsEntities = goodsRepository.findAllById(goodsIds);
+        if (goodsIds.size() != goodsEntities.size()) {
+            throw new GoodsNotExistException();
+        }
 
         GoodsOrderEntity order = goodsOrder.create(orderId, adminUserId, UserTypeEnum.ADMIN);
 
@@ -55,9 +69,18 @@ public class ShopServiceImpl implements ShopService {
     @Override
     public PayResult saleGoods(BuyRequest buyRequest) {
         Long userId = buyRequest.getUserId();
+        Integer merchantId = buyRequest.getMerchantId();
         String orderId = buyRequest.getOrderId();
+        List<Long> goodsIds = buyRequest.getGoodsAmountRequests().stream()
+                .map(GoodsAmountRequest::getGoodsId)
+                .toList();
 
         userRepository.findById(userId).orElseThrow(UserNotExistException::new);
+        merchantRepository.findById(merchantId).orElseThrow(MerchantNotExistException::new);
+        List<GoodsEntity> goodsEntities = goodsRepository.findAllById(goodsIds);
+        if (goodsIds.size() != goodsEntities.size()) {
+            throw new GoodsNotExistException();
+        }
 
         GoodsOrderEntity order = goodsOrder.create(orderId, userId, UserTypeEnum.USER);
 

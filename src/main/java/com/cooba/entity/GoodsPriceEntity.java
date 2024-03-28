@@ -1,5 +1,6 @@
 package com.cooba.entity;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -9,13 +10,11 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import javax.persistence.Entity;
 import javax.persistence.EntityListeners;
-import javax.persistence.ForeignKey;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
-import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
 import javax.persistence.Version;
@@ -27,7 +26,9 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @Builder
 @Entity(name = "goods_price")
-@Table
+@Table(uniqueConstraints = {
+        @UniqueConstraint(name = "unique_key", columnNames = {"goods_id", "assetId"}),
+})
 @EntityListeners(AuditingEntityListener.class)
 public class GoodsPriceEntity {
     @Id
@@ -40,6 +41,7 @@ public class GoodsPriceEntity {
     @LastModifiedDate
     private LocalDateTime updatedTime;
 
+    @JsonManagedReference
     @ManyToOne
     @JoinColumn(name = "goods_id")
     private GoodsEntity goods;
