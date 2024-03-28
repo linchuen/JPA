@@ -7,25 +7,23 @@ import com.cooba.component.warehouse.WarehouseFactory;
 import com.cooba.entity.GoodsEntity;
 import com.cooba.entity.GoodsInventoryEntity;
 import com.cooba.entity.GoodsPriceEntity;
-import com.cooba.entity.GoodsRecordEntity;
 import com.cooba.entity.MerchantEntity;
 import com.cooba.enums.AssetEnum;
 import com.cooba.enums.GoodsTransferEnum;
 import com.cooba.enums.WarehouseEnum;
 import com.cooba.repository.GoodsPriceRepository;
-import com.cooba.repository.GoodsRecordRepository;
 import com.cooba.repository.GoodsRepository;
 import com.cooba.repository.MerchantRepository;
 import com.cooba.request.BuyRequest;
 import com.cooba.request.CreateGoodsRequest;
 import com.cooba.request.CreateMerchantRequest;
-import com.cooba.request.GoodsAmountRequest;
 import com.cooba.request.RestockRequest;
 import com.cooba.result.CreateGoodsResult;
 import com.cooba.result.CreateMerchantResult;
 import com.cooba.result.InventoryChangeResult;
 import com.cooba.result.PayResult;
 import com.cooba.result.RestockResult;
+import com.cooba.result.SendGoodsResult;
 import com.cooba.result.UpdatePriceResult;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
@@ -98,6 +96,23 @@ public class ShopImpl implements Shop {
     }
 
     @Override
+    public UpdatePriceResult updateGoodsPrice(Long goodsId, Integer assetId, BigDecimal price) {
+        GoodsPriceEntity goodsPrice = goodsPriceRepository.findByGoodsIdAndAssetId(goodsId, assetId)
+                .orElse(GoodsPriceEntity.builder()
+                        .goods(GoodsEntity.builder().id(goodsId).build())
+                        .assetId(assetId)
+                        .build());
+        goodsPrice.setPrice(price);
+        goodsPriceRepository.save(goodsPrice);
+
+        return UpdatePriceResult.builder()
+                .goodsId(goodsId)
+                .assetId(assetId)
+                .price(goodsPrice.getPrice())
+                .build();
+    }
+
+    @Override
     @Transactional(rollbackFor = Exception.class)
     public RestockResult restockGoods(RestockRequest restockRequest) {
         String orderId = restockRequest.getOrderId();
@@ -119,35 +134,27 @@ public class ShopImpl implements Shop {
     }
 
     @Override
-    public UpdatePriceResult updateGoodsPrice(Long goodsId, Integer assetId, BigDecimal price) {
-        GoodsPriceEntity goodsPrice = goodsPriceRepository.findByGoodsIdAndAssetId(goodsId, assetId)
-                .orElse(GoodsPriceEntity.builder()
-                        .goods(GoodsEntity.builder().id(goodsId).build())
-                        .assetId(assetId)
-                        .build());
-        goodsPrice.setPrice(price);
-        goodsPriceRepository.save(goodsPrice);
-
-        return UpdatePriceResult.builder()
-                .goodsId(goodsId)
-                .assetId(assetId)
-                .price(goodsPrice.getPrice())
-                .build();
-    }
-
-    @Override
-    public void sendGoods(PayResult payResult, BuyRequest buyRequest) {
+    public SendGoodsResult sendGoods(PayResult payResult, BuyRequest buyRequest) {
         String orderId = buyRequest.getOrderId();
         Integer merchantId = buyRequest.getMerchantId();
 
         Warehouse warehouse = warehouseFactory.getByEnum(WarehouseEnum.DEFAULT);
-        for (GoodsAmountRequest goodsAmountRequest : buyRequest.getGoodsAmountRequests()) {
+        List<SendGoodsResult.SendGoodInfo> sendGoodInfoList = buyRequest.getGoodsAmountRequests().stream().map(goodsAmountRequest -> {
             Long goodsId = goodsAmountRequest.getGoodsId();
             BigDecimal amount = goodsAmountRequest.getAmount();
 
             InventoryChangeResult changeResult = warehouse.decreaseGoods(goodsId, amount);
             goodsRecord.insertRecord(orderId, merchantId, goodsId, amount, GoodsTransferEnum.SALE, changeResult);
-        }
+            return SendGoodsResult.SendGoodInfo.builder()
+                    .goodsId(goodsId)
+                    .changeAmount(amount)
+                    .remainAmount(changeResult.getRemainAmount())
+                    .build();
+        }).toList();
+
+        return SendGoodsResult.builder()
+                .sendGoodInfoList(sendGoodInfoList)
+                .build();
     }
 
 }

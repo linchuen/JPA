@@ -19,9 +19,11 @@ import com.cooba.request.BuyRequest;
 import com.cooba.request.CreateMerchantRequest;
 import com.cooba.request.GoodsAmountRequest;
 import com.cooba.request.RestockRequest;
+import com.cooba.result.BuyResult;
 import com.cooba.result.CreateMerchantResult;
 import com.cooba.result.PayResult;
 import com.cooba.result.RestockResult;
+import com.cooba.result.SendGoodsResult;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -68,7 +70,7 @@ public class ShopServiceImpl implements ShopService {
     }
 
     @Override
-    public PayResult saleGoods(BuyRequest buyRequest) {
+    public BuyResult saleGoods(BuyRequest buyRequest) {
         Long userId = buyRequest.getUserId();
         Integer merchantId = buyRequest.getMerchantId();
         String orderId = buyRequest.getOrderId();
@@ -87,8 +89,13 @@ public class ShopServiceImpl implements ShopService {
 
         User user = userFactory.getByEnum(UserEnum.DEFAULT);
         PayResult payResult = user.pay(buyRequest);
-        shop.sendGoods(payResult, buyRequest);
+        SendGoodsResult sendGoodsResult = shop.sendGoods(payResult, buyRequest);
         goodsOrder.updateStatus(order);
-        return payResult;
+        return BuyResult.builder()
+                .isSuccess(true)
+                .totalPrice(payResult.getTotalPrice())
+                .transferBalance(payResult.getTransferBalance())
+                .sendGoodInfoList(sendGoodsResult.getSendGoodInfoList())
+                .build();
     }
 }

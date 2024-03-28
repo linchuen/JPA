@@ -6,6 +6,7 @@ import com.cooba.request.CreateMerchantRequest;
 import com.cooba.request.RestockRequest;
 import com.cooba.response.BaseResponse;
 import com.cooba.response.SuccessResponse;
+import com.cooba.result.BuyResult;
 import com.cooba.result.CreateMerchantResult;
 import com.cooba.result.PayResult;
 import com.cooba.result.RestockResult;
@@ -43,12 +44,12 @@ public class ShopController {
     }
 
     @PostMapping("/goods/sale")
-    public BaseResponse<PayResult> saleGoods(@Valid @RequestBody BuyRequest buyRequest) {
+    public BaseResponse<BuyResult> saleGoods(@Valid @RequestBody BuyRequest buyRequest) {
         if (buyRequest.getOrderId() == null) {
             String orderId = orderNumGenerator.generate(OrderEnum.GOODS);
             buyRequest.setOrderId(orderId);
         }
-        PayResult payResult = shopService.saleGoods(buyRequest);
-        return new SuccessResponse<>(payResult);
+        BuyResult buyResult = shopService.saleGoods(buyRequest);
+        return new SuccessResponse<>(buyResult);
     }
 }
