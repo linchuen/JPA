@@ -8,6 +8,7 @@ import com.cooba.entity.GoodsInventoryEntity;
 import com.cooba.entity.GoodsPriceEntity;
 import com.cooba.entity.GoodsRecordEntity;
 import com.cooba.entity.MerchantEntity;
+import com.cooba.enums.AssetEnum;
 import com.cooba.enums.GoodsTransferEnum;
 import com.cooba.enums.WarehouseEnum;
 import com.cooba.repository.GoodsRecordRepository;
@@ -70,7 +71,9 @@ public class ShopImpl implements Shop {
                 .build();
         goodsEntity.setInventory(initInventory);
 
+        String assetName = null;
         if (price != null && assetId != null && price.compareTo(BigDecimal.ZERO) > 0) {
+            assetName = AssetEnum.getEnum(assetId).orElseThrow().name();
             GoodsPriceEntity goodsPrice = GoodsPriceEntity.builder()
                     .goods(goodsEntity)
                     .assetId(assetId)
@@ -84,6 +87,9 @@ public class ShopImpl implements Shop {
         return CreateGoodsResult.builder()
                 .goodsId(goodsEntity.getId())
                 .name(name)
+                .assetId(assetId)
+                .assetName(assetName)
+                .price(price)
                 .build();
     }
 
