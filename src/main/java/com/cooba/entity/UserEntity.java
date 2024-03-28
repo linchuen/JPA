@@ -32,7 +32,7 @@ import java.util.List;
 @EntityListeners(AuditingEntityListener.class)
 public class UserEntity {
     @Id
-    @GeneratedValue(strategy= GenerationType.AUTO)
+    @GeneratedValue(strategy= GenerationType.IDENTITY)
     private Long id;
     private String name;
     @CreatedDate

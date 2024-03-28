@@ -24,7 +24,7 @@ import java.util.List;
 @EntityListeners(AuditingEntityListener.class)
 public class GoodsOrderEntity {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String orderId;
     private Long userId;
