@@ -63,7 +63,6 @@ public class DefaultWarehouse implements Warehouse {
     public GoodsInventoryEntity createNewInventory(int merchantId, long goodsId) {
         GoodsInventoryEntity goodsInventory = GoodsInventoryEntity.builder()
                 .merchantId(merchantId)
-                .goodsId(goodsId)
                 .remainAmount(BigDecimal.ZERO)
                 .build();
         return goodsInventoryRepository.save(goodsInventory);

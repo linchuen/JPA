@@ -25,8 +25,7 @@ import java.time.LocalDateTime;
 @Builder
 @Entity(name = "wallet")
 @Table(
-        uniqueConstraints = @UniqueConstraint(name = "unique_key", columnNames = {"userId", "assetId"}),
-        indexes = @Index(name = "updateTime", columnList = "updateTime"))
+        uniqueConstraints = @UniqueConstraint(name = "unique_key", columnNames = {"userId", "assetId"}))
 @EntityListeners(AuditingEntityListener.class)
 public class WalletEntity {
     @Id
@@ -38,5 +37,5 @@ public class WalletEntity {
     @CreatedDate
     private LocalDateTime createdTime;
     @LastModifiedDate
-    private LocalDateTime updateTime;
+    private LocalDateTime updatedTime;
 }

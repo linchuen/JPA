@@ -34,5 +34,5 @@ public class MerchantEntity {
     @CreatedDate
     private LocalDateTime createdTime;
     @LastModifiedDate
-    private LocalDateTime updateTime;
+    private LocalDateTime updatedTime;
 }
