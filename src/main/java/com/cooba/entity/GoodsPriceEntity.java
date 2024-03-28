@@ -41,6 +41,6 @@ public class GoodsPriceEntity {
     private LocalDateTime updatedTime;
 
     @ManyToOne
-    @JoinColumn(name = "goods_id", foreignKey = @ForeignKey(name = "goods_fk"))
+    @JoinColumn(name = "goods_id")
     private GoodsEntity goods;
 }

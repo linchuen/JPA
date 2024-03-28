@@ -4,6 +4,7 @@ package com.cooba.component.shop;
 import com.cooba.component.warehouse.Warehouse;
 import com.cooba.component.warehouse.WarehouseFactory;
 import com.cooba.entity.GoodsEntity;
+import com.cooba.entity.GoodsInventoryEntity;
 import com.cooba.entity.GoodsRecordEntity;
 import com.cooba.entity.MerchantEntity;
 import com.cooba.enums.GoodsTransferEnum;
@@ -60,12 +61,18 @@ public class ShopImpl implements Shop {
                 .merchantId(merchantId)
                 .name(name)
                 .build();
+        GoodsInventoryEntity initInventory = GoodsInventoryEntity.builder()
+                .merchantId(merchantId)
+                .remainAmount(BigDecimal.ZERO)
+                .goods(goodsEntity)
+                .build();
+        goodsEntity.setInventory(initInventory);
         goodsRepository.save(goodsEntity);
 
         Long goodsId = goodsEntity.getId();
-
-        Warehouse warehouse = warehouseFactory.getByEnum(WarehouseEnum.DEFAULT);
-        warehouse.createNewInventory(merchantId, goodsId);
+//
+//        Warehouse warehouse = warehouseFactory.getByEnum(WarehouseEnum.DEFAULT);
+//        warehouse.createNewInventory(merchantId, goodsId);
 
         return CreateGoodsResult.builder()
                 .goodsId(goodsId)

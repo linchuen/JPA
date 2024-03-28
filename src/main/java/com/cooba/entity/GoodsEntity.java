@@ -11,6 +11,7 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.EntityListeners;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -41,9 +42,9 @@ public class GoodsEntity {
     @LastModifiedDate
     private LocalDateTime updatedTime;
 
-    @OneToOne(cascade = CascadeType.ALL, mappedBy = "goods")
+    @OneToOne(cascade = CascadeType.ALL, mappedBy = "goods", fetch = FetchType.EAGER)
     private GoodsInventoryEntity inventory;
 
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "goods")
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "goods", fetch = FetchType.EAGER)
     private List<GoodsPriceEntity> price;
 }

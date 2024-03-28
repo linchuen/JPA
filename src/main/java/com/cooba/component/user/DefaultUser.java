@@ -3,16 +3,17 @@ package com.cooba.component.user;
 import com.cooba.component.wallet.Wallet;
 import com.cooba.component.wallet.WalletFactory;
 import com.cooba.component.walletorder.WalletOrder;
-import com.cooba.dto.InventoryPriceDto;
+import com.cooba.entity.GoodsEntity;
+import com.cooba.entity.GoodsPriceEntity;
 import com.cooba.entity.UserEntity;
 import com.cooba.entity.WalletOrderEntity;
 import com.cooba.enums.OrderEnum;
-import com.cooba.enums.WalletTransferEnum;
 import com.cooba.enums.UserEnum;
 import com.cooba.enums.WalletEnum;
+import com.cooba.enums.WalletTransferEnum;
 import com.cooba.exception.CurrencyNotSupportException;
 import com.cooba.exception.EmptyStockException;
-import com.cooba.mapper.GoodsInventoryMapper;
+import com.cooba.repository.GoodsRepository;
 import com.cooba.repository.UserRepository;
 import com.cooba.request.BuyRequest;
 import com.cooba.request.CreateUserRequest;
@@ -27,7 +28,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -38,7 +38,7 @@ public class DefaultUser implements User {
     private final WalletFactory walletFactory;
     private final UserRepository userRepository;
     private final WalletOrder walletOrder;
-    private final GoodsInventoryMapper goodsInventoryMapper;
+    private final GoodsRepository goodsRepository;
     private final OrderNumGenerator orderNumGenerator;
 
     @Override
@@ -87,26 +87,30 @@ public class DefaultUser implements User {
     public PayResult pay(BuyRequest buyRequest) {
         Long userId = buyRequest.getUserId();
         Integer paymentAssetId = buyRequest.getPaymentAssetId();
-        List<GoodsAmountRequest> goodsAmountRequests = buyRequest.getGoodsAmountRequests();
-        List<Long> idList = goodsAmountRequests.stream().map(GoodsAmountRequest::getGoodsId).collect(Collectors.toList());
-        List<InventoryPriceDto> inventoryPriceDtoList = goodsInventoryMapper.findWithPriceByIds(idList);
 
-        boolean isEmptyStock = inventoryPriceDtoList.stream()
-                .anyMatch(inventoryPriceDto -> inventoryPriceDto.getRemainAmount().compareTo(BigDecimal.ZERO) == 0);
-        if (isEmptyStock){
+        Map<Long, BigDecimal> idAmountMap = buyRequest.getGoodsAmountRequests().stream()
+                .collect(Collectors.toMap(
+                        GoodsAmountRequest::getGoodsId,
+                        GoodsAmountRequest::getAmount));
+        List<GoodsEntity> goodsEntities = goodsRepository.findByGoodsIdIn(idAmountMap.keySet());
+
+        boolean isEmptyStock = goodsEntities.stream().map(GoodsEntity::getInventory)
+                .anyMatch(inventory -> inventory.getRemainAmount().compareTo(BigDecimal.ZERO) == 0);
+        if (isEmptyStock) {
             throw new EmptyStockException();
         }
 
-        Map<Long,BigDecimal> goodsIdPriceMap= inventoryPriceDtoList.stream()
-                .filter(inventoryPriceDto -> inventoryPriceDto.getAssetId().equals(paymentAssetId))
-                .collect(Collectors.toMap(InventoryPriceDto::getGoodsId, InventoryPriceDto::getPrice));
-        if (goodsIdPriceMap.size()!= inventoryPriceDtoList.size()){
+        List<GoodsPriceEntity> goodsPriceEntities = goodsEntities.stream()
+                .flatMap(goodsEntity -> goodsEntity.getPrice().stream())
+                .filter(goodsPriceEntity -> goodsPriceEntity.getAssetId().equals(paymentAssetId))
+                .toList();
+        if (goodsPriceEntities.size() != idAmountMap.size()) {
             throw new CurrencyNotSupportException();
         }
 
-        BigDecimal totalPrice = goodsAmountRequests.stream()
-                .map(request -> request.getAmount().multiply(goodsIdPriceMap.get(request.getGoodsId())))
-                .reduce(BigDecimal.ZERO,BigDecimal::add);
+        BigDecimal totalPrice = goodsPriceEntities.stream()
+                .map(price -> price.getPrice().multiply(idAmountMap.get(price.getGoods().getId())))
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
 
         String orderId = orderNumGenerator.generate(OrderEnum.WALLET);
 
