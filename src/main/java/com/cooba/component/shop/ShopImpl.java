@@ -1,6 +1,7 @@
 package com.cooba.component.shop;
 
 
+import com.cooba.component.goodsrecord.GoodsRecord;
 import com.cooba.component.warehouse.Warehouse;
 import com.cooba.component.warehouse.WarehouseFactory;
 import com.cooba.entity.GoodsEntity;
@@ -39,7 +40,7 @@ public class ShopImpl implements Shop {
     private final MerchantRepository merchantRepository;
     private final GoodsRepository goodsRepository;
     private final GoodsPriceRepository goodsPriceRepository;
-    private final GoodsRecordRepository goodsRecordRepository;
+    private final GoodsRecord goodsRecord;
     private final WarehouseFactory warehouseFactory;
 
     @Override
@@ -108,7 +109,7 @@ public class ShopImpl implements Shop {
             BigDecimal amount = goodsAmountRequest.getAmount();
 
             InventoryChangeResult changeResult = warehouse.increaseGoods(goodsId, amount);
-            insertRecord(orderId, merchantId, goodsId, amount, GoodsTransferEnum.RESTOCK, changeResult);
+            goodsRecord.insertRecord(orderId, merchantId, goodsId, amount, GoodsTransferEnum.RESTOCK, changeResult);
             return changeResult;
         }).toList();
         return RestockResult.builder()
@@ -144,20 +145,8 @@ public class ShopImpl implements Shop {
             BigDecimal amount = goodsAmountRequest.getAmount();
 
             InventoryChangeResult changeResult = warehouse.decreaseGoods(goodsId, amount);
-            insertRecord(orderId, merchantId, goodsId, amount, GoodsTransferEnum.SALE, changeResult);
+            goodsRecord.insertRecord(orderId, merchantId, goodsId, amount, GoodsTransferEnum.SALE, changeResult);
         }
-    }
-
-    private void insertRecord(String orderId, Integer merchantId, Long goodsId, BigDecimal amount, GoodsTransferEnum transferType, InventoryChangeResult inventoryChangeResult) {
-        GoodsRecordEntity record = GoodsRecordEntity.builder()
-                .orderId(orderId)
-                .merchantId(merchantId)
-                .goodsId(goodsId)
-                .transferType(transferType.getType())
-                .changeAmount(amount)
-                .remainAmount(inventoryChangeResult.getRemainAmount())
-                .build();
-        goodsRecordRepository.save(record);
     }
 
 }

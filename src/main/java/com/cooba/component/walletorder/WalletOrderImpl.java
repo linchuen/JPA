@@ -1,8 +1,8 @@
 package com.cooba.component.walletorder;
 
 import com.cooba.entity.WalletOrderEntity;
-import com.cooba.enums.WalletTransferEnum;
 import com.cooba.enums.WalletStatusEnum;
+import com.cooba.enums.WalletTransferEnum;
 import com.cooba.repository.WalletRecordRepository;
 import com.cooba.request.WalletRequest;
 import com.cooba.result.WalletChangeResult;
@@ -11,7 +11,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
+import java.math.BigDecimal;
 
 @Component
 @RequiredArgsConstructor
@@ -21,11 +21,14 @@ public class WalletOrderImpl implements WalletOrder {
     @Override
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRES_NEW)
     public WalletOrderEntity create(WalletRequest walletRequest, WalletTransferEnum transferType) {
+        boolean isWithdraw = transferType == WalletTransferEnum.WITHDRAW;
+        BigDecimal amount = walletRequest.getAmount();
+
         WalletOrderEntity order = WalletOrderEntity.builder()
                 .orderId(walletRequest.getOrderId())
                 .userId(walletRequest.getUserId())
                 .assetId(walletRequest.getAssetId())
-                .amount(walletRequest.getAmount())
+                .amount(isWithdraw ? amount.negate() : amount)
                 .transferType(transferType.getType())
                 .status(WalletStatusEnum.FAILED.getType())
                 .build();
