@@ -20,8 +20,9 @@ import java.util.concurrent.TimeUnit;
 @Component
 @RequiredArgsConstructor
 public class DefaultWallet implements Wallet {
-    private final WalletRepository walletRepository;
     private final CustomLock customLock;
+    //Repository
+    private final WalletRepository walletRepository;
 
     @Override
     @Transactional(rollbackFor = Exception.class)

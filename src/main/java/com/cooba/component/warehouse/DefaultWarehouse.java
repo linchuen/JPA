@@ -18,8 +18,9 @@ import java.util.concurrent.TimeUnit;
 @Component
 @RequiredArgsConstructor
 public class DefaultWarehouse implements Warehouse {
-    private final GoodsInventoryRepository goodsInventoryRepository;
     private final CustomLock customLock;
+    //Repository
+    private final GoodsInventoryRepository goodsInventoryRepository;
 
     @Override
     @Transactional(rollbackFor = Exception.class)

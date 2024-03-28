@@ -20,6 +20,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class GoodsServiceImpl implements GoodsService {
     private final Shop shop;
+    //Repository
     private final MerchantRepository merchantRepository;
     private final GoodsRepository goodsRepository;
 

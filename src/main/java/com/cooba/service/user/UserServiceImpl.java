@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
     private final UserFactory userFactory;
+    //Repository
     private final UserRepository userRepository;
 
     @Override

@@ -37,11 +37,12 @@ import java.util.List;
 @Component
 @RequiredArgsConstructor
 public class ShopImpl implements Shop {
+    private final GoodsRecord goodsRecord;
+    private final WarehouseFactory warehouseFactory;
+    //Repository
     private final MerchantRepository merchantRepository;
     private final GoodsRepository goodsRepository;
     private final GoodsPriceRepository goodsPriceRepository;
-    private final GoodsRecord goodsRecord;
-    private final WarehouseFactory warehouseFactory;
 
     @Override
     public CreateMerchantResult createMerchant(CreateMerchantRequest createMerchantRequest) {

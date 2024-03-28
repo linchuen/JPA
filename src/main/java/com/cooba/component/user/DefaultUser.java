@@ -38,10 +38,11 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class DefaultUser implements User {
     private final WalletFactory walletFactory;
-    private final UserRepository userRepository;
-    private final WalletOrder walletOrder;
-    private final GoodsRepository goodsRepository;
     private final OrderNumGenerator orderNumGenerator;
+    private final WalletOrder walletOrder;
+    //Repository
+    private final GoodsRepository goodsRepository;
+    private final UserRepository userRepository;
 
     @Override
     public CreateUserResult create(CreateUserRequest createUserRequest) {

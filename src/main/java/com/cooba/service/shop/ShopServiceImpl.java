@@ -33,6 +33,7 @@ public class ShopServiceImpl implements ShopService {
     private final Shop shop;
     private final UserFactory userFactory;
     private final GoodsOrder goodsOrder;
+    //Repository
     private final UserRepository userRepository;
     private final AdminRepository adminRepository;
     private final MerchantRepository merchantRepository;
