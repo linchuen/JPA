@@ -39,7 +39,6 @@ public class GoodsInventoryEntity {
     @LastModifiedDate
     private LocalDateTime updatedTime;
 
-    @JsonManagedReference
     @OneToOne
     @JoinColumn(name = "goods_id")
     private GoodsEntity goods;

@@ -41,7 +41,6 @@ public class GoodsPriceEntity {
     @LastModifiedDate
     private LocalDateTime updatedTime;
 
-    @JsonManagedReference
     @ManyToOne
     @JoinColumn(name = "goods_id")
     private GoodsEntity goods;

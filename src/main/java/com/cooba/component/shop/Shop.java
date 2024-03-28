@@ -15,5 +15,7 @@ public interface Shop {
 
     RestockResult restockGoods(RestockRequest restockRequest);
 
+    void updateGoodsPrice(UpdatePriceRequest updatePriceRequest);
+
     void sendGoods(PayResult payResult, BuyRequest buyRequest);
 }

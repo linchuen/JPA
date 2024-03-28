@@ -3,10 +3,10 @@ package com.cooba.service.goods;
 import com.cooba.component.shop.Shop;
 import com.cooba.entity.GoodsEntity;
 import com.cooba.exception.MerchantNotExistException;
-import com.cooba.exception.UserNotExistException;
 import com.cooba.repository.GoodsRepository;
 import com.cooba.repository.MerchantRepository;
 import com.cooba.request.CreateGoodsRequest;
+import com.cooba.response.GoodsResponse;
 import com.cooba.result.CreateGoodsResult;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -28,8 +28,24 @@ public class GoodsServiceImpl implements GoodsService {
     }
 
     @Override
-    public List<GoodsEntity> listGoods() {
-        return goodsRepository.findAll();
+    public List<GoodsResponse> listGoods() {
+        return goodsRepository.findAll().stream()
+                .map(goodsEntity -> GoodsResponse.builder()
+                        .merchantId(goodsEntity.getMerchantId())
+                        .name(goodsEntity.getName())
+                        .remainAmount(goodsEntity.getInventory().getRemainAmount())
+                        .priceList(getPriceList(goodsEntity))
+                        .build())
+                .toList();
+    }
+
+    private List<GoodsResponse.Price> getPriceList(GoodsEntity goodsEntity) {
+        return goodsEntity.getPrice().stream()
+                .map(goodsPrice -> GoodsResponse.Price.builder()
+                        .price(goodsPrice.getPrice())
+                        .assetId(goodsPrice.getAssetId())
+                        .build())
+                .toList();
     }
 
 }

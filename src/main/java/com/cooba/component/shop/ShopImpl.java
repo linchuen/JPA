@@ -5,6 +5,7 @@ import com.cooba.component.warehouse.Warehouse;
 import com.cooba.component.warehouse.WarehouseFactory;
 import com.cooba.entity.GoodsEntity;
 import com.cooba.entity.GoodsInventoryEntity;
+import com.cooba.entity.GoodsPriceEntity;
 import com.cooba.entity.GoodsRecordEntity;
 import com.cooba.entity.MerchantEntity;
 import com.cooba.enums.GoodsTransferEnum;
@@ -17,6 +18,7 @@ import com.cooba.request.CreateGoodsRequest;
 import com.cooba.request.CreateMerchantRequest;
 import com.cooba.request.GoodsAmountRequest;
 import com.cooba.request.RestockRequest;
+import com.cooba.request.UpdatePriceRequest;
 import com.cooba.result.CreateGoodsResult;
 import com.cooba.result.CreateMerchantResult;
 import com.cooba.result.InventoryChangeResult;
@@ -55,6 +57,8 @@ public class ShopImpl implements Shop {
     public CreateGoodsResult createGoods(CreateGoodsRequest createGoodsRequest) {
         Integer merchantId = createGoodsRequest.getMerchantId();
         String name = createGoodsRequest.getName();
+        BigDecimal price = createGoodsRequest.getPrice();
+        Integer assetId = createGoodsRequest.getAssetId();
 
         GoodsEntity goodsEntity = GoodsEntity.builder()
                 .merchantId(merchantId)
@@ -65,6 +69,16 @@ public class ShopImpl implements Shop {
                 .goods(goodsEntity)
                 .build();
         goodsEntity.setInventory(initInventory);
+
+        if (price != null && assetId != null && price.compareTo(BigDecimal.ZERO) > 0) {
+            GoodsPriceEntity goodsPrice = GoodsPriceEntity.builder()
+                    .goods(goodsEntity)
+                    .assetId(assetId)
+                    .price(price)
+                    .build();
+            goodsEntity.setPrice(List.of(goodsPrice));
+        }
+
         goodsRepository.save(goodsEntity);
 
         return CreateGoodsResult.builder()
@@ -91,6 +105,11 @@ public class ShopImpl implements Shop {
         return RestockResult.builder()
                 .changeResults(changeResults)
                 .build();
+    }
+
+    @Override
+    public void updateGoodsPrice(UpdatePriceRequest updatePriceRequest) {
+
     }
 
     @Override

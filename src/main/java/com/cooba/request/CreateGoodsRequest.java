@@ -4,6 +4,7 @@ import lombok.Data;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
+import java.math.BigDecimal;
 
 @Data
 public class CreateGoodsRequest {
@@ -11,4 +12,7 @@ public class CreateGoodsRequest {
     private Integer merchantId;
     @NotBlank
     private String name;
+
+    private Integer assetId;
+    private BigDecimal price;
 }

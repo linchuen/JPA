@@ -44,11 +44,9 @@ public class GoodsEntity {
     @LastModifiedDate
     private LocalDateTime updatedTime;
 
-    @JsonBackReference
     @OneToOne(cascade = CascadeType.ALL, mappedBy = "goods", fetch = FetchType.EAGER)
     private GoodsInventoryEntity inventory;
 
-    @JsonBackReference
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "goods", fetch = FetchType.EAGER)
     private List<GoodsPriceEntity> price;
 }
