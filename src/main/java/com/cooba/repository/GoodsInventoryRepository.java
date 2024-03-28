@@ -12,5 +12,5 @@ import java.util.Optional;
 @Repository
 public interface GoodsInventoryRepository extends JpaRepository<GoodsInventoryEntity, Long> {
 
-    Optional<GoodsInventoryEntity> findByMerchantIdAndGoodsId(Integer merchantId, Long goodsId);
+    Optional<GoodsInventoryEntity> findByGoodsId(Long goodsId);
 }

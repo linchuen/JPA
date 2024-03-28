@@ -11,7 +11,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
 import java.util.concurrent.TimeUnit;
 
 @Slf4j
@@ -22,12 +21,12 @@ public class DefaultWarehouse implements Warehouse {
     private final CustomLock customLock;
 
     @Override
-    public InventoryChangeResult increaseGoods(int merchantId, long goodsId, BigDecimal amount) {
-        String key = this.getEnum().name() + merchantId + goodsId;
+    public InventoryChangeResult increaseGoods(long goodsId, BigDecimal amount) {
+        String key = this.getEnum().name() + goodsId;
 
         return customLock.tryLock(key, 1, TimeUnit.SECONDS, () -> {
-            GoodsInventoryEntity goodsInventoryEntity = goodsInventoryRepository.findByMerchantIdAndGoodsId(merchantId, goodsId)
-                    .orElseGet(() -> createNewInventory(merchantId, goodsId));
+            GoodsInventoryEntity goodsInventoryEntity = goodsInventoryRepository.findByGoodsId(goodsId)
+                    .orElseGet(() -> createNewInventory(goodsId));
             BigDecimal remainAmount = goodsInventoryEntity.getRemainAmount().add(amount);
             goodsInventoryEntity.setRemainAmount(remainAmount);
             goodsInventoryRepository.save(goodsInventoryEntity);
@@ -39,12 +38,12 @@ public class DefaultWarehouse implements Warehouse {
     }
 
     @Override
-    public InventoryChangeResult decreaseGoods(int merchantId, long goodsId, BigDecimal amount) {
-        String key = this.getEnum().name() + merchantId + goodsId;
+    public InventoryChangeResult decreaseGoods(long goodsId, BigDecimal amount) {
+        String key = this.getEnum().name() + goodsId;
 
         return customLock.tryLock(key, 1, TimeUnit.SECONDS, () -> {
-            GoodsInventoryEntity goodsInventoryEntity =  goodsInventoryRepository.findByMerchantIdAndGoodsId(merchantId, goodsId)
-                    .orElseGet(() -> createNewInventory(merchantId, goodsId));
+            GoodsInventoryEntity goodsInventoryEntity = goodsInventoryRepository.findByGoodsId(goodsId)
+                    .orElseGet(() -> createNewInventory(goodsId));
             BigDecimal remainAmount = goodsInventoryEntity.getRemainAmount().subtract(amount);
 
             if (remainAmount.compareTo(BigDecimal.ZERO) < 0) {
@@ -60,7 +59,7 @@ public class DefaultWarehouse implements Warehouse {
         });
     }
 
-    public GoodsInventoryEntity createNewInventory(int merchantId, long goodsId) {
+    public GoodsInventoryEntity createNewInventory(long goodsId) {
         GoodsInventoryEntity goodsInventory = GoodsInventoryEntity.builder()
                 .remainAmount(BigDecimal.ZERO)
                 .build();

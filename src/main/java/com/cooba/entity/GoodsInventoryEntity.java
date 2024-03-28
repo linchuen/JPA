@@ -30,7 +30,6 @@ public class GoodsInventoryEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
-    private Integer merchantId;
     private BigDecimal remainAmount;
     @LastModifiedDate
     private LocalDateTime updatedTime;

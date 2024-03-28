@@ -27,7 +27,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
 import java.util.List;
 
 @Component
@@ -62,20 +61,14 @@ public class ShopImpl implements Shop {
                 .name(name)
                 .build();
         GoodsInventoryEntity initInventory = GoodsInventoryEntity.builder()
-                .merchantId(merchantId)
                 .remainAmount(BigDecimal.ZERO)
                 .goods(goodsEntity)
                 .build();
         goodsEntity.setInventory(initInventory);
         goodsRepository.save(goodsEntity);
 
-        Long goodsId = goodsEntity.getId();
-//
-//        Warehouse warehouse = warehouseFactory.getByEnum(WarehouseEnum.DEFAULT);
-//        warehouse.createNewInventory(merchantId, goodsId);
-
         return CreateGoodsResult.builder()
-                .goodsId(goodsId)
+                .goodsId(goodsEntity.getId())
                 .name(name)
                 .build();
     }
@@ -91,7 +84,7 @@ public class ShopImpl implements Shop {
             Long goodsId = goodsAmountRequest.getGoodsId();
             BigDecimal amount = goodsAmountRequest.getAmount();
 
-            InventoryChangeResult changeResult = warehouse.increaseGoods(merchantId, goodsId, amount);
+            InventoryChangeResult changeResult = warehouse.increaseGoods(goodsId, amount);
             insertRecord(orderId, merchantId, goodsId, amount, GoodsTransferEnum.RESTOCK, changeResult);
             return changeResult;
         }).toList();
@@ -110,7 +103,7 @@ public class ShopImpl implements Shop {
             Long goodsId = goodsAmountRequest.getGoodsId();
             BigDecimal amount = goodsAmountRequest.getAmount();
 
-            InventoryChangeResult changeResult = warehouse.decreaseGoods(merchantId, goodsId, amount);
+            InventoryChangeResult changeResult = warehouse.decreaseGoods(goodsId, amount);
             insertRecord(orderId, merchantId, goodsId, amount, GoodsTransferEnum.SALE, changeResult);
         }
     }

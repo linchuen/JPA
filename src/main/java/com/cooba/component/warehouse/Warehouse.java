@@ -9,11 +9,11 @@ import java.math.BigDecimal;
 
 public interface Warehouse extends Component<WarehouseEnum> {
 
-    InventoryChangeResult increaseGoods(int merchantId, long goodsId, BigDecimal amount);
+    InventoryChangeResult increaseGoods(long goodsId, BigDecimal amount);
 
-    InventoryChangeResult decreaseGoods(int merchantId, long goodsId, BigDecimal amount);
+    InventoryChangeResult decreaseGoods(long goodsId, BigDecimal amount);
 
-    GoodsInventoryEntity createNewInventory(int merchantId, long goodsId);
+    GoodsInventoryEntity createNewInventory(long goodsId);
 
     WarehouseEnum getEnum();
 }
