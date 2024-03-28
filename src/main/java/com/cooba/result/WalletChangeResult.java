@@ -1,12 +1,12 @@
 package com.cooba.result;
 
+import lombok.Builder;
 import lombok.Data;
-import lombok.experimental.Accessors;
 
 import java.math.BigDecimal;
 
 @Data
-@Accessors(fluent = true)
+@Builder
 public class WalletChangeResult {
     private BigDecimal transferBalance;
 }

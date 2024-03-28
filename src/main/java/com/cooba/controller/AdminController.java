@@ -19,9 +19,10 @@ public class AdminController {
 
     @PostMapping("/create")
     public BaseResponse<Boolean> create() {
-        AdminEntity admin = new AdminEntity()
+        AdminEntity admin = AdminEntity.builder()
                 .id(1L)
-                .name("Admin");
+                .name("Admin")
+                .build();
         adminRepository.save(admin);
         return new SuccessResponse<>(true);
     }

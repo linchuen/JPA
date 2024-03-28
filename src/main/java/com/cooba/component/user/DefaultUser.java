@@ -45,18 +45,21 @@ public class DefaultUser implements User {
 
     @Override
     public CreateUserResult create(CreateUserRequest createUserRequest) {
-        UserEntity userEntity = new UserEntity()
-                .name(createUserRequest.getName());
-        WalletEntity walletEntity = new WalletEntity()
+        UserEntity userEntity = UserEntity.builder()
+                .name(createUserRequest.getName())
+                .build();
+        WalletEntity walletEntity = WalletEntity.builder()
                 .assetId(AssetEnum.TWD.getId())
                 .balance(BigDecimal.ZERO)
-                .user(userEntity);
-        userEntity.wallet(List.of(walletEntity));
+                .user(userEntity)
+                .build();
+        userEntity.setWallet(List.of(walletEntity));
 
         userRepository.save(userEntity);
-        return new CreateUserResult()
-                .id(userEntity.id())
-                .name(userEntity.name());
+        return CreateUserResult.builder()
+                .id(userEntity.getId())
+                .name(userEntity.getName())
+                .build();
     }
 
     @Override
@@ -100,22 +103,22 @@ public class DefaultUser implements User {
                         GoodsAmountRequest::getAmount));
         List<GoodsEntity> goodsEntities = goodsRepository.findAllById(idAmountMap.keySet());
 
-        boolean isEmptyStock = goodsEntities.stream().map(GoodsEntity::inventory)
-                .anyMatch(inventory -> inventory.remainAmount().compareTo(BigDecimal.ZERO) == 0);
+        boolean isEmptyStock = goodsEntities.stream().map(GoodsEntity::getInventory)
+                .anyMatch(inventory -> inventory.getRemainAmount().compareTo(BigDecimal.ZERO) == 0);
         if (isEmptyStock) {
             throw new EmptyStockException();
         }
 
         List<GoodsPriceEntity> goodsPriceEntities = goodsEntities.stream()
-                .flatMap(goodsEntity -> goodsEntity.price().stream())
-                .filter(goodsPriceEntity -> goodsPriceEntity.assetId().equals(paymentAssetId))
+                .flatMap(goodsEntity -> goodsEntity.getPrice().stream())
+                .filter(goodsPriceEntity -> goodsPriceEntity.getAssetId().equals(paymentAssetId))
                 .toList();
         if (goodsPriceEntities.size() != idAmountMap.size()) {
             throw new CurrencyNotSupportException();
         }
 
         BigDecimal totalPrice = goodsPriceEntities.stream()
-                .map(price -> price.price().multiply(idAmountMap.get(price.goods().id())))
+                .map(price -> price.getPrice().multiply(idAmountMap.get(price.getGoods().getId())))
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
 
         String orderId = orderNumGenerator.generate(OrderEnum.WALLET);
@@ -131,10 +134,11 @@ public class DefaultUser implements User {
         WalletChangeResult walletChangeResult = wallet.decreaseAsset(userId, paymentAssetId, totalPrice);
         walletOrder.updateStatus(order, walletChangeResult);
 
-        return new PayResult()
+        return PayResult.builder()
                 .isSuccess(true)
-                .transferBalance(walletChangeResult.transferBalance())
-                .totalPrice(totalPrice);
+                .transferBalance(walletChangeResult.getTransferBalance())
+                .totalPrice(totalPrice)
+                .build();
     }
 
 

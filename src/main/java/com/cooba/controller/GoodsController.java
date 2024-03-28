@@ -1,12 +1,10 @@
 package com.cooba.controller;
 
 import com.cooba.request.CreateGoodsRequest;
-import com.cooba.request.UpdatePriceRequest;
 import com.cooba.response.BaseResponse;
 import com.cooba.response.GoodsResponse;
 import com.cooba.response.SuccessResponse;
 import com.cooba.result.CreateGoodsResult;
-import com.cooba.result.UpdatePriceResult;
 import com.cooba.service.goods.GoodsService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -34,12 +32,6 @@ public class GoodsController {
     public BaseResponse<CreateGoodsResult> create(@Valid @RequestBody CreateGoodsRequest createGoodsRequest) {
         CreateGoodsResult goodsResult = goodsService.createGoods(createGoodsRequest);
         return new SuccessResponse<>(goodsResult);
-    }
-
-    @PostMapping("/price/update")
-    public BaseResponse<UpdatePriceResult> updatePrice(@Valid @RequestBody UpdatePriceRequest updatePriceRequest) {
-        UpdatePriceResult updatePriceResult = goodsService.updatePrice(updatePriceRequest);
-        return new SuccessResponse<>(updatePriceResult);
     }
 
 }
