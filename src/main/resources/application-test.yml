@@ -1,6 +1,12 @@
 spring:
   datasource:
-    url: jdbc:mysql://127.0.0.1:3306/jpa
-    username: root
-    password: root
-    driver-class-name: com.mysql.cj.jdbc.Driver
+    driver-class-name: org.h2.Driver
+    schema: classpath:db/schema-*.sql #，每次启动程序，程序都会运行schema.sql文件，对数据库的数据操作
+    data: classpath:db/data-*.sql #，每次启动程序，程序都会运行data.sql文件，对数据库的数据操作
+    url: jdbc:h2:mem:testdb;MODE=MYSQL
+    initialize: false
+    username: sa
+    password: sa
+  h2:
+    console:
+      enabled: true
