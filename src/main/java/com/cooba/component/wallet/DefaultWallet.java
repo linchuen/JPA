@@ -32,6 +32,7 @@ public class DefaultWallet implements Wallet {
         return customLock.tryLock(key, 3, TimeUnit.SECONDS, () -> {
             WalletEntity walletEntity = walletRepository.findByUserIdAndAssetId(userId, assetId)
                     .orElseGet(() -> createNewWallet(userId, assetId));
+            System.out.println(walletEntity.getBalance());
             BigDecimal transferBalance = walletEntity.getBalance().add(amount);
             walletEntity.setBalance(transferBalance);
             walletRepository.save(walletEntity);
