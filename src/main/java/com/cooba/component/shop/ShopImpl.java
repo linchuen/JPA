@@ -134,6 +134,7 @@ public class ShopImpl implements Shop {
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public SendGoodsResult sendGoods(PayResult payResult, BuyRequest buyRequest) {
         String orderId = buyRequest.getOrderId();
         Integer merchantId = buyRequest.getMerchantId();

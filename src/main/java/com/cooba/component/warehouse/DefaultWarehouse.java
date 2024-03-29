@@ -47,7 +47,7 @@ public class DefaultWarehouse implements Warehouse {
 
         return customLock.tryLock(key, 3, TimeUnit.SECONDS, () -> {
             GoodsInventoryEntity goodsInventoryEntity = goodsInventoryRepository.findByGoodsId(goodsId)
-                    .orElseGet(() -> createNewInventory(goodsId));
+                    .orElseThrow(InsufficientBalanceException::new);
             BigDecimal remainAmount = goodsInventoryEntity.getRemainAmount().subtract(amount);
 
             if (remainAmount.compareTo(BigDecimal.ZERO) < 0) {

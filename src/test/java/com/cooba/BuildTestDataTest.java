@@ -80,7 +80,7 @@ public class BuildTestDataTest {
 
     @Test
     public void deposit() {
-        MultiThreadUtil.run(5,()->{
+        MultiThreadUtil.run(5, () -> {
             WalletRequest walletRequest = new WalletRequest();
             walletRequest.setUserId(1L);
             walletRequest.setAssetId(AssetEnum.TWD.getId());
@@ -91,12 +91,28 @@ public class BuildTestDataTest {
 
     @Test
     public void withdraw() {
-        MultiThreadUtil.run(5,()->{
+        MultiThreadUtil.run(5, () -> {
             WalletRequest walletRequest = new WalletRequest();
             walletRequest.setUserId(1L);
             walletRequest.setAssetId(AssetEnum.TWD.getId());
             walletRequest.setAmount(BigDecimal.TEN);
             userController.withdraw(walletRequest);
+        });
+    }
+
+    @Test
+    public void saleGoods() {
+        MultiThreadUtil.run(10, () -> {
+            GoodsAmountRequest goodsAmountRequest = new GoodsAmountRequest();
+            goodsAmountRequest.setGoodsId(1L);
+            goodsAmountRequest.setAmount(BigDecimal.valueOf(1));
+
+            BuyRequest buyRequest = new BuyRequest();
+            buyRequest.setMerchantId(1);
+            buyRequest.setUserId(1L);
+            buyRequest.setPaymentAssetId(AssetEnum.TWD.getId());
+            buyRequest.setGoodsAmountRequests(List.of(goodsAmountRequest));
+            shopController.saleGoods(buyRequest);
         });
     }
 }

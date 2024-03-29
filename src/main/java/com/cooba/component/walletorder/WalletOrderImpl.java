@@ -3,7 +3,7 @@ package com.cooba.component.walletorder;
 import com.cooba.entity.WalletOrderEntity;
 import com.cooba.enums.WalletStatusEnum;
 import com.cooba.enums.WalletTransferEnum;
-import com.cooba.repository.WalletRecordRepository;
+import com.cooba.repository.WalletOrderRepository;
 import com.cooba.request.WalletRequest;
 import com.cooba.result.WalletChangeResult;
 import lombok.RequiredArgsConstructor;
@@ -16,7 +16,7 @@ import java.math.BigDecimal;
 @Component
 @RequiredArgsConstructor
 public class WalletOrderImpl implements WalletOrder {
-    private final WalletRecordRepository walletRecordRepository;
+    private final WalletOrderRepository walletOrderRepository;
 
     @Override
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRES_NEW)
@@ -32,7 +32,7 @@ public class WalletOrderImpl implements WalletOrder {
                 .transferType(transferType)
                 .status(WalletStatusEnum.FAILED)
                 .build();
-        walletRecordRepository.save(order);
+        walletOrderRepository.save(order);
         return order;
     }
 
@@ -40,6 +40,6 @@ public class WalletOrderImpl implements WalletOrder {
     public void updateStatus(WalletOrderEntity order, WalletChangeResult walletChangeResult) {
         order.setTransferBalance(walletChangeResult.getTransferBalance());
         order.setStatus(WalletStatusEnum.SUCCEED);
-        walletRecordRepository.save(order);
+        walletOrderRepository.updateStatusById(order.getId(), walletChangeResult.getTransferBalance(), WalletStatusEnum.SUCCEED);
     }
 }
