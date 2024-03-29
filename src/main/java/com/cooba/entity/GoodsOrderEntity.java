@@ -4,10 +4,7 @@ import com.cooba.enums.GoodsStatusEnum;
 import com.cooba.enums.UserTypeEnum;
 import com.cooba.enums.converter.GoodsStatusConverter;
 import com.cooba.enums.converter.UserTypeConverter;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
@@ -17,7 +14,8 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 
-@Data
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
