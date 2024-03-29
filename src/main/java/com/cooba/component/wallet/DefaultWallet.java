@@ -10,7 +10,6 @@ import com.cooba.util.lock.CustomLock;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
@@ -32,7 +31,6 @@ public class DefaultWallet implements Wallet {
         return customLock.tryLock(key, 3, TimeUnit.SECONDS, () -> {
             WalletEntity walletEntity = walletRepository.findByUserIdAndAssetId(userId, assetId)
                     .orElseGet(() -> createNewWallet(userId, assetId));
-            System.out.println(walletEntity.getBalance());
             BigDecimal transferBalance = walletEntity.getBalance().add(amount);
             walletEntity.setBalance(transferBalance);
             walletRepository.save(walletEntity);
@@ -65,12 +63,11 @@ public class DefaultWallet implements Wallet {
     }
 
     private WalletEntity createNewWallet(long userId, int assetId) {
-        WalletEntity walletEntity = WalletEntity.builder()
+        return WalletEntity.builder()
                 .user(UserEntity.builder().id(userId).build())
                 .assetId(assetId)
                 .balance(BigDecimal.ZERO)
                 .build();
-        return walletRepository.save(walletEntity);
     }
 
     @Override

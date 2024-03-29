@@ -88,4 +88,15 @@ public class BuildTestDataTest {
             userController.deposit(walletRequest);
         });
     }
+
+    @Test
+    public void withdraw() {
+        MultiThreadUtil.run(5,()->{
+            WalletRequest walletRequest = new WalletRequest();
+            walletRequest.setUserId(1L);
+            walletRequest.setAssetId(AssetEnum.TWD.getId());
+            walletRequest.setAmount(BigDecimal.TEN);
+            userController.withdraw(walletRequest);
+        });
+    }
 }

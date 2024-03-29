@@ -12,3 +12,7 @@ spring:
       idle-timeout: 600000
       max-lifetime: 1800000
       pool-name: HikariConnPool
+
+logging:
+  level:
+    root: info
